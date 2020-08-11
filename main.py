@@ -2,24 +2,33 @@ import logging
 import os
 import discord
 import customclient
+import time as t
 
 from discord.ext import commands
 
 import SECRETS
+from dbmgr import DbMgr
 
 
-def get_prefix(_, message): # Maybe replace _ with client
-	if message.guild is not None:
+def get_prefix(client, message):  # Maybe replace _ with client
+	if message.guild is None:
 		# TODO: Prefixs
 		return '!'
+	else:
+		return client.dbconf_get(message.guild.id, 'prefix', '!')
 
 
 logger = logging.getLogger('discord')
 logger.setLevel(logging.DEBUG)
-handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
+handler = logging.FileHandler(
+	filename=
+	f'[{t.struct_time(t.gmtime())[0]}-{t.struct_time(t.gmtime())[1]}-{t.struct_time(t.gmtime())[2]}]-['
+	f'{t.struct_time(t.gmtime())[3]}_{t.struct_time(t.gmtime())[4]}]-discord.log',
+	encoding='utf-8',
+	mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
-client = customclient.CustomClient(command_prefix=get_prefix)
+client = customclient.CustomClient(command_prefix=get_prefix, db=DbMgr("db"))
 
 
 @client.event
@@ -33,23 +42,20 @@ async def on_ready():
 @client.command()
 async def ping(ctx):
 	"""Zeigt den aktuellen Ping"""
-	await client.delete_cmd(ctx)
 	await ctx.send(f'Pong! Meine Latenz sind aktuell {round(client.latency * 1000)} ms.')
 
 
 @client.command()
 @commands.is_owner()
-async def status(ctx, *, status):
-	await client.change_presence(status=discord.Status.online, activity=discord.Game(status))
-	await client.delete_cmd(ctx)
-	await ctx.send(f'Der Status lautet nun: **{status}**')
+async def status(ctx, *, status_text):
+	await client.change_presence(status=discord.Status.online, activity=discord.Game(status_text))
+	await ctx.send(f'Der Status lautet nun: **{status_text}**')
 
 
 @client.command()
 @commands.is_owner()
 async def load(ctx, extension):
 	"""Lädt ein Modul in den Bot"""
-	await client.delete_cmd(ctx)
 	client.load_extension(f'cogs.{extension.lower()}')
 	await ctx.send(f":green_circle: {extension} aktiviert")
 	print(f'{extension} aktiviert')
@@ -59,7 +65,6 @@ async def load(ctx, extension):
 @commands.is_owner()
 async def unload(ctx, extension):
 	"""Lädt ein Modul aus dem Bot"""
-	await client.delete_cmd(ctx)
 	client.unload_extension(f'cogs.{extension.lower()}')
 	print(f'{extension} deaktiviert')
 	await ctx.send(f':red_circle: {extension} deaktiviert')
@@ -69,7 +74,6 @@ async def unload(ctx, extension):
 @commands.is_owner()
 async def reload(ctx, extension):
 	"""Lädt ein Modul neu"""
-	await client.delete_cmd(ctx)
 	if extension == "all":
 		for filename in os.listdir('./cogs'):
 			if filename.endswith(".py"):
@@ -78,7 +82,7 @@ async def reload(ctx, extension):
 						try:
 							client.reload_extension(f'cogs.{filename[:-3]}')
 							await ctx.send(f':white_circle: {filename[:-3]} neugeladen')
-						except Exception:
+						except commands.ExtensionError:
 							await ctx.send(f':red_circle: {filename[:-3]} konnte nicht neugeladen werden')
 			elif filename.endswith('__pycache__'):
 				await ctx.send(f':whitecheckmark: Pycache vorhanden')
