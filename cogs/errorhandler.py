@@ -10,6 +10,7 @@ class ErrorHandler(commands.Cog):
 	# ErrorHandler
 	@commands.Cog.listener()
 	async def on_command_error(self, ctx, error, force=False):
+		await ctx.message.delete(delay=10)
 		# Skippen, wenn wir einen lokalen Handler haben
 		if hasattr(ctx.command, 'on_error') and not force:
 			return
@@ -28,16 +29,17 @@ class ErrorHandler(commands.Cog):
 					ctx.message.content[1:].startswith("d bump") or ctx.message.content[1:].startswith("disboard"):
 				return
 			await ctx.send("Diesen Befehl gibt es nicht :(")
-		# DiscordErrors
-		elif isinstance(error, commands.CommandError):
-			await ctx.send(f"Irgendwas funktioniert da nicht ganz...{error} {type(error)} <@!137291894953607168>")
+
 		# Sonstige Errors
 		elif isinstance(error, discord.errors.Forbidden):
 			await ctx.send(f"403-Forbidden Mir sind Hände und Füße gebunden ich habe keine Rechte!")
 		elif isinstance(error, discord.InvalidData):
 			await ctx.send(f'InvalidData - Discord hat mir komische Daten gesendet...')
-		elif isinstance(error, discord.InvalidArgument):
+		elif isinstance(error, (discord.InvalidArgument, commands.BadArgument, commands.BadUnionArgument)):
 			await ctx.send(f'Dieses Argument ist nicht erlaubt für diese Methode.')
+		# DiscordErrors
+		elif isinstance(error, commands.CommandError):
+			await ctx.send(f"Irgendwas funktioniert da nicht ganz...{error} {type(error)} <@!137291894953607168>")
 		# Sonstige Errors
 		else:
 			await ctx.send(f"Ein unerwarteter Fehler ist aufgetreten! \n{error} {type(error)} <@!137291894953607168>")
