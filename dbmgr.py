@@ -3,6 +3,8 @@ import os
 import re
 import sqlite3
 
+import discord
+
 
 class DbMgr:
 	def __init__(self, dbpath="db"):

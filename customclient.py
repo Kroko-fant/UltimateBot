@@ -6,7 +6,8 @@ class CustomClient(DBot):
 	def __init__(self, db, **options):
 		super().__init__(**options)
 		self.db = db
-		self.del_time_small = 20
+		self.del_time_small = 10
+		self.del_time_medium = 30
 		self.del_time_long = 60
 
 	async def delete_cmd(self, ctx):

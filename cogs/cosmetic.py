@@ -1,6 +1,7 @@
 from discord.ext import commands
 
 
+# A class containing cosmeticas for the bot in Form of events.
 class Cosmetic(commands.Cog):
 
 	def __init__(self, client):
