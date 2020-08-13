@@ -38,15 +38,15 @@ class Admin(commands.Cog):
 
 		matches = re.match(r'`(.*)`', query)
 		if not matches:
-			await ctx.send("Couldn't filter out the query that should be executed.")
+			await ctx.send("Couldn't filter out the query that should be executed.", delete_after=self.client.del_time_small)
 			return
 
 		query = matches.group(1)
 		try:
-			with self.bot.db.get(ctx.guild.id) as db:
+			with self.client.db.get(ctx.guild.id) as db:
 				result = [dict(row) for row in db.execute(query).fetchall()]
 		except sqlite3.OperationalError as e:
-			await ctx.send(f"```{e}```")
+			await ctx.send(f"```{e}```", delete_after=self.client.del_time_long)
 			return
 
 		if len(result) < 1:
@@ -57,7 +57,7 @@ class Admin(commands.Cog):
 
 		for row in result:
 			for key in keys:
-				if not key in key_length:
+				if key not in key_length:
 					key_length[key] = len(str(key))
 
 				key_length[key] = max(key_length[key], len(str(row[key])))
@@ -76,12 +76,12 @@ class Admin(commands.Cog):
 
 			# -6: Account for code block
 			if len(text) + len(newtext) >= 2000 - 6:
-				await ctx.send(f"```{text}```")
+				await ctx.send(f"```{text}```", delete_after=self.client.del_time_long)
 				text = ""
 
 			text += newtext
 
-		await ctx.send(f"```{text}```")
+		await ctx.send(f"```{text}```", delete_after=self.client.del_time_long)
 
 
 def setup(client):
