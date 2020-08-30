@@ -20,7 +20,7 @@ class Dawum(commands.Cog):
 			'de-nw': 10, 'nrw': 10, 'nordrhein': 10, 'westfalen': 10, 'nordrhein-westfalen': 10, 'rp': 11, 'de-rp': 11,
 			'rheinland-pfalz': 11, 'rheinland': 11, 'pfalz': 11, 'sl': 12, 'de-sl': 12, 'saarland': 12, 'saar': 12,
 			'sn': 13, 'de-sn': 13, 'sachsen': 13, 'sac': 13, 'st': 14, 'de-st': 14, 'sachsen-anhalt': 14,
-			'anhalt': 14, 'sh': 15, 'de-sh': 15, 'schleswig-holstein': 15, 'schleswig': 15,
+			'anhalt': 14, 'sh': 15, 'de-sh': 15, 'schleswig-holstein': 15, 'schleswig': 15, "deutschland": 0,
 			'holstein': 15, 'th': 16, 'de-th': 16, 'thüringen': 16, 'thü': 16, 'eu': 17, 'europa': 17, "de": 0}
 		partycodes = {
 			'CDU': 101, 'CSU': 102, 'CDU/CSU': 1, 'SPD': 2, 'Die Grünen': 4, 'Afd': 7, 'Linke': 5, 'FDP': 3,
@@ -32,7 +32,7 @@ class Dawum(commands.Cog):
 				else [int(k) for k, v in data['Surveys'].items() if v['Parliament_ID'] == str(parlacode.lower())]
 		else:
 			if parlacode not in parlamentcodes:
-				return parlacode
+				return None
 			parlacode = str(parlamentcodes[parlacode])
 			umfragenid = [int(k) for k, v in data['Surveys'].items() if v['Parliament_ID'] == str(parlacode.lower())]
 		
@@ -81,7 +81,11 @@ class Dawum(commands.Cog):
 			await ctx.send(embed=wahlhelfembed, delete_after=self.client.del_time_mid)
 		else:
 			result = self.umfrage_ausgeben(parla, int(count))
-			await ctx.send(embed=result, delete_after=self.client.del_time_long)
+			if result is None:
+				await ctx.send(embed=discord.Embed(
+					title="Error!", description="Dein Parlament konnte nicht gefunden werden!"))
+			else:
+				await ctx.send(embed=result, delete_after=self.client.del_time_long)
 
 
 def setup(client):
