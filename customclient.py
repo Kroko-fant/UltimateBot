@@ -9,6 +9,7 @@ class CustomClient(DBot):
 		self.del_time_small = 10
 		self.del_time_mid = 30
 		self.del_time_long = 60
+		self.prefixes = dict()
 
 	async def delete_cmd(self, ctx):
 		if ctx.guild is None:

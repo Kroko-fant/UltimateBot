@@ -11,11 +11,11 @@ from dbmgr import DbMgr
 
 
 def get_prefix(client, message):
-	if message.guild is None:
+	if message.guild is None or message.guild.id not in client.prefixes:
 		return '!'
 	else:
-		return client.dbconf_get(message.guild.id, 'prefix', '!')
-
+		return client.prefixes[message.guild.id]
+		
 
 logger = logging.getLogger('discord')
 logger.setLevel(logging.DEBUG)
@@ -59,6 +59,8 @@ async def reload_modules(ctx):
 @client.event
 async def on_ready():
 	await client.change_presence(status=discord.Status.online, activity=discord.Game('Bot online und bereit'))
+	for g in client.guilds:
+		client.prefixes[g.id] = client.dbconf_get(g.id, 'prefix', '!')
 	print('Status geändert\nModule werden geladen')
 	load_modules()
 
