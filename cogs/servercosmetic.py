@@ -10,6 +10,7 @@ class ServerCosmetic(commands.Cog):
 	@commands.has_permissions(administrator=True)
 	async def prefix(self, ctx, prefix):
 		# TODO: Permissionlevel
+		self.client.prefixes[ctx.guild.id] = prefix
 		self.client.dbconf_set(ctx.guild.id, "prefix", prefix)
 		await ctx.send(f"Prefix wurde zu {prefix} geändert", delete_after=self.client.del_time_small)
 
