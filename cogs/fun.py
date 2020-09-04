@@ -45,7 +45,9 @@ class Fun(commands.Cog):
 		"""Gebe eine zufällige Zahl zwischen 0 und x ein.
 		Syntax: {prefix}randomnumber <x>
 		Hat x keinen Wert bekommt x automatisch 100 zugewiesen."""
-		await ctx.send(f"Die zufällige Zahl zwischen **0** und **{int2}** ist: **{random.randint(0, int2)}**")
+		if int2 <= 0:
+			await ctx.send("Deine Zahl sollte größer als 0 sein!")
+		await self.client.send(ctx, f"Deine Nummer zwischen 0 und {int2} lautet: **{random.randint(0, int2)}**")
 	
 	@commands.command()
 	async def card(self, ctx):
@@ -85,7 +87,6 @@ class Fun(commands.Cog):
 		userinfoembed.add_field(name='Bot?', value=str(member.bot))
 		
 		await ctx.send(embed=userinfoembed)
-
-
+	
 def setup(client):
 	client.add_cog(Fun(client))
