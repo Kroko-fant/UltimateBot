@@ -19,7 +19,7 @@ def xp(l, k=0):
 
 def get_text_xp(length):
 	if length < 10:
-		return 0
+		return 0.1
 	else:
 		return r.randint(0, 1000) / (2020 - length)
 
@@ -41,6 +41,7 @@ class Xp(commands.Cog):
 	async def xp(self, ctx, userid=None):
 		if userid is None:
 			userid = ctx.author.id
+			
 		def parseXP(disid):
 			with self.client.db.get(ctx.guild.id) as db:
 				row = db.execute("SELECT xp, level FROM leveldata WHERE userId = ?", (disid,)).fetchall()
