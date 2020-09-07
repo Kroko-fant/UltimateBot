@@ -26,15 +26,15 @@ class ServerCosmetic(commands.Cog):
 			self.client.dbconf_set(ctx.guild.id, key, value)
 			await ctx.send(f"{k.capitalize()}-Channel erfolgreich gesetzt!")
 		
-		if key in ["bump", "log", "botlog", "invitelog"]:
+		if key in ["bump", "logchannel", "botlog", "invitelog"]:
 			setchannel(key)
 		else:
 			await ctx.send(
 				embed=discord.Embed(
 					title="Set-Help",
 					description=
-					"bump\tSetzt den Kanal in welchem gebumpt werden soll\nlog\tSetzt den Kanal in welchem der Log sein"
-					" soll.\nbotlog\tSetzt den Kanal in welchem der Bot seine Statusmeldungen posten soll\n"
+					"bump\tSetzt den Kanal in welchem gebumpt werden soll\nlogchannel\tSetzt den Kanal in welchem der "
+					"Log sein soll.\nbotlog\tSetzt den Kanal in welchem der Bot seine Statusmeldungen posten soll\n"
 					"invitelog\tSetzt den Kanal in welchem der Bot Invites Trackt"))
 
 
