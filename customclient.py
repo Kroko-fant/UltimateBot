@@ -1,5 +1,4 @@
 from discord.ext.commands import Bot as DBot
-import re as r
 
 
 class CustomClient(DBot):
