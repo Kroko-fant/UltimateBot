@@ -86,6 +86,23 @@ class Logging(commands.Cog):
 			self.client.send(logch, string)
 		except Exception:
 			pass
+	
+	# Voice-Änderungen
+	@commands.Cog.listener()
+	async def on_voice_state_update(self, member, before, after):
+		if member is None or member.guild is None:
+			return
+		with self.get_logchannel(member.guild.id) as logch:
+			if before.channel is None:
+				await logch.send(
+					f":mega: **{member} ({member.id})** hat den Voice Channel **{before.channel}** verlassen.")
+			elif before.channel is not None and after.channel is None:
+				await logch.send(
+					f":mega: **{member} ({member.id})** hat den Voice Channel **{before.channel}** verlassen.")
+			elif before.channel is not None and after.channel is not None:
+				await logch.send(
+					f":mega: **{member} ({member.id} )** hat den Voice Channel von ** {before.channel} ** zu ** "
+					f"{after.channel}** gewechselt.")
 
 
 def setup(client):
