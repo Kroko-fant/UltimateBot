@@ -20,14 +20,14 @@ class ServerCosmetic(commands.Cog):
 	async def set(self, ctx, key, value=""):
 		"""Setze eine Variable auf einen bestimmten Wert. Für Hilfe welche Variablen es gibt gebe !set help ein."""
 		
-		def setchannel(k):
+		async def setchannel(k):
 			if not value.isnumeric():
 				await ctx.send("Das ist kein gültiger Discord-Kanal!")
 			self.client.dbconf_set(ctx.guild.id, key, value)
 			await ctx.send(f"{k.capitalize()}-Channel erfolgreich gesetzt!")
 		
 		if key in ["bump", "logchannel", "botlog", "invitelog"]:
-			setchannel(key)
+			await setchannel(key)
 		else:
 			await ctx.send(
 				embed=discord.Embed(

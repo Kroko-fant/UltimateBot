@@ -1,7 +1,7 @@
-from discord.ext.commands import Bot as DBot
+from discord.ext.commands import Bot
 
 
-class CustomClient(DBot):
+class CustomClient(Bot):
 
 	def __init__(self, db, **options):
 		super().__init__(**options)

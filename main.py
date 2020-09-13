@@ -24,7 +24,7 @@ handler = logging.FileHandler(
 	f'{t.struct_time(t.gmtime())[3]}_{t.struct_time(t.gmtime())[4]}]-discord.log', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
-client = customclient.CustomClient(command_prefix=get_prefix, db=DbMgr("db"))
+client = customclient.CustomClient(DbMgr("db"), command_prefix=get_prefix)
 
 
 def load_modules():
@@ -61,8 +61,8 @@ async def on_ready():
 	await client.change_presence(status=discord.Status.online, activity=discord.Game('Bot online und bereit'))
 	for g in client.guilds:
 		client.prefixes[g.id] = client.dbconf_get(g.id, 'prefix', '!')
-	print('Status geändert\nModule werden geladen')
-	load_modules()
+	print('Status geändert')
+
 
 
 @client.command()
@@ -150,10 +150,7 @@ async def on_command_error(ctx, error, force=False):
 
 
 print("Botstart abgeschlossen!")
-
-client.run(SECRETS.TOKEN)
 print(f'{client.user} ist jetzt online')
-number = 0
-for s in range(len(client.guilds)):
-	number += 1
-print(f'Bot läuft auf {number} Servern')
+print(f'Bot läuft auf {len(client.guilds)} Servern')
+load_modules()
+client.run(SECRETS.TOKEN)
