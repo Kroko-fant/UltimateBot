@@ -8,6 +8,7 @@ class Admin(commands.Cog):
 
 	def __init__(self, client):
 		self.client = client
+		self.dmchannel = 635544300834258995
 
 	@commands.command()
 	@commands.is_owner()
@@ -16,8 +17,8 @@ class Admin(commands.Cog):
 			await ch.send(text)
 		except discord.DiscordException:
 			await ctx.message.add_reaction("⚠")
-			return
-		await ctx.message.add_reaction(self.client.get_emoji(634870836255391754))
+		else:
+			await ctx.message.add_reaction(self.client.get_emoji(634870836255391754))
 
 	@commands.command(aliases=["dm", "pm"])
 	@commands.is_owner()
@@ -30,14 +31,31 @@ class Admin(commands.Cog):
 			await ctx.message.add_reaction("⚠")
 			return
 		await ctx.message.add_reaction(self.client.get_emoji(634870836255391754))
-
+	
+	@commands.Cog.listener()
+	async def on_message(self, message):
+		if message.member.bot or message.guild is None:
+			return
+		# DMs empfangen
+		if message.guild is None:
+			channel = self.client.get_channel(int(self.dmchannel))
+			content = f'**{message.author}** sagt: "{message.content}"'
+			self.client.send(channel, content)
+		# DMs senden
+		elif message.channel.id == self.dmchannel and message.content[0:18].isnumeric():
+			await message.add_reaction("✅")
+			dmchannel = self.client.get_user(int(message.content[0:18]))
+			if dmchannel.dm_channel is None:
+				await dmchannel.create_dm()
+			await dmchannel.dm_channel.send(message.content[19:])
+	
 	@commands.command()
 	@commands.is_owner()
 	async def sql(self, ctx, *, query):
 		"""Executes a SQL-query"""
 		matches = re.match(r'`(.*)`', query)
 		if not matches:
-			await ctx.send("Couldn't filter out the query that should be executed.", delete_after=self.client.del_time_small)
+			await ctx.send("Ungültige Eingabe der Query", delete_after=self.client.del_time_small)
 			return
 
 		query = matches.group(1)

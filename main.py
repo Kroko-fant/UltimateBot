@@ -64,7 +64,6 @@ async def on_ready():
 	print('Status geändert')
 
 
-
 @client.command()
 async def ping(ctx):
 	"""Zeigt den aktuellen Ping"""
@@ -126,7 +125,6 @@ async def on_command_error(ctx, error, force=False):
 	error = getattr(error, 'original', error)
 	if not isinstance(error, commands.ExtensionError):
 		return
-	
 	# Extension already loaded
 	if isinstance(error, commands.ExtensionAlreadyLoaded):
 		await ctx.send(f"Die Extension ist bereits geladen!")
