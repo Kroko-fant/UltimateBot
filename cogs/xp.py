@@ -65,7 +65,7 @@ class Xp(commands.Cog):
 	@commands.Cog.listener()
 	async def on_message(self, ctx):
 		# Ignore DMs
-		if ctx.guild.id is None:
+		if ctx.guild is None or ctx.guild.id is None:
 			return
 		
 		# TODO: Cooldown

@@ -9,25 +9,20 @@ class ServerCosmetic(commands.Cog):
 
 	@commands.command()
 	@commands.has_permissions(administrator=True)
-	async def prefix(self, ctx, prefix):
-		# TODO: Permissionlevel
-		self.client.prefixes[ctx.guild.id] = prefix
-		self.client.dbconf_set(ctx.guild.id, "prefix", prefix)
-		await ctx.send(f"Prefix wurde zu {prefix} geändert", delete_after=self.client.del_time_small)
-	
-	@commands.command()
-	@commands.has_permissions(administrator=True)
 	async def set(self, ctx, key, value=""):
 		"""Setze eine Variable auf einen bestimmten Wert. Für Hilfe welche Variablen es gibt gebe !set help ein."""
 		
 		async def setchannel(k):
 			if not value.isnumeric():
-				await ctx.send("Das ist kein gültiger Discord-Kanal!")
+				raise ValueError
 			self.client.dbconf_set(ctx.guild.id, key, value)
-			await ctx.send(f"{k.capitalize()}-Channel erfolgreich gesetzt!")
-		
-		if key in ["bump", "logchannel", "botlog", "invitelog"]:
+			
+		if key in ["prefix", "bump", "logchannel", "botlog", "invitelog"]:
 			await setchannel(key)
+			await ctx.send(f"{key.capitalize()}-Channel erfolgreich gesetzt!", delete_after=self.client.del_time_small)
+		elif key == "prefix":
+			self.client.dbconf_set(ctx.guild.id, key, value)
+			await ctx.send(f"Prefix wurde zu {value} geändert", delete_after=self.client.del_time_small)
 		else:
 			await ctx.send(
 				embed=discord.Embed(
