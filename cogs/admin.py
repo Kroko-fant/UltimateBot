@@ -34,13 +34,13 @@ class Admin(commands.Cog):
 	
 	@commands.Cog.listener()
 	async def on_message(self, message):
-		if message.member.bot or message.guild is None:
+		if message.author is None or message.author.bot:
 			return
 		# DMs empfangen
 		if message.guild is None:
 			channel = self.client.get_channel(int(self.dmchannel))
 			content = f'**{message.author}** sagt: "{message.content}"'
-			self.client.send(channel, content)
+			await self.client.send(channel, content)
 		# DMs senden
 		elif message.channel.id == self.dmchannel and message.content[0:18].isnumeric():
 			await message.add_reaction("✅")
