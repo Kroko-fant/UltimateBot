@@ -1,11 +1,12 @@
 import discord
 import random as r
+import time as t
 from discord.ext import commands
 
 
 ADDITIONALXP = 20
 BASEXP = 100
-
+COOLDOWN_TIME = 60
 
 # Returns a Level to a certain xp amount
 def level(x, l=0):
@@ -29,6 +30,9 @@ class Xp(commands.Cog):
 	def __init__(self, client):
 		self.levels = [xp(lev) for lev in range(0, 250)]
 		self.client = client
+		self.cooldowns = dict()
+
+	# TODO: "Garbage-Collector" der cooldowns cleart
 	
 	def get_level(self, userxp):
 		if userxp < self.levels[0]:
@@ -67,8 +71,16 @@ class Xp(commands.Cog):
 		# Ignore DMs
 		if ctx.guild is None or ctx.guild.id is None:
 			return
+		try:
+			if t.time() - self.cooldowns[ctx.guild.id][ctx.author.id] < 60:
+				return
+		except KeyError:
+			pass
+		# TODO: Cooldown#
+		if ctx.guild.id not in self.cooldowns.keys():
+			self.cooldowns[ctx.guild.id] = dict()
+		self.cooldowns[ctx.guild.id][ctx.author.id] = t.time()
 		
-		# TODO: Cooldown
 		# Ignore Commands
 		if ctx.content.startswith(self.client.prefixes[ctx.guild.id]):
 			return
