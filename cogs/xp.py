@@ -3,26 +3,27 @@ import random as r
 import time as t
 from discord.ext import commands
 
-
 ADDITIONALXP = 20
 BASEXP = 100
 COOLDOWN_TIME = 60
 
+
 # Returns a Level to a certain xp amount
-def level(x, l=0):
-	return l if x - l * ADDITIONALXP <= BASEXP + ADDITIONALXP else level(x - l * ADDITIONALXP, l=l + 1)
+def level(x, rec_lev=0):
+	return rec_lev if x - rec_lev * ADDITIONALXP <= BASEXP + ADDITIONALXP else level(
+		x - rec_lev * ADDITIONALXP, rec_lev=rec_lev + 1)
 
 
 # returns how much xp is needed for a level
-def xp(l, k=0):
-	return k + 100 + ADDITIONALXP if l == 0 else xp(l - 1, k=k + l * ADDITIONALXP)
+def xp(input_level, k=0):
+	return k + 100 + ADDITIONALXP if input_level == 0 else xp(input_level - 1, k=k + input_level * ADDITIONALXP)
 
 
 def get_text_xp(length):
 	if length < 10:
-		return 0.1
+		return r.randint(0, 100) / 50
 	else:
-		return r.randint(0, 1000) / (2020 - length)
+		return round((r.randint(100, 1000) + length) / (2222 - length), 2)
 
 
 class Xp(commands.Cog):
@@ -31,7 +32,7 @@ class Xp(commands.Cog):
 		self.levels = [xp(lev) for lev in range(0, 250)]
 		self.client = client
 		self.cooldowns = dict()
-
+	
 	# TODO: "Garbage-Collector" der cooldowns cleart
 	
 	def get_level(self, userxp):
@@ -45,27 +46,39 @@ class Xp(commands.Cog):
 	async def xp(self, ctx, userid=None):
 		if userid is None:
 			userid = ctx.author.id
-			
-		def parseXP(disid):
+		
+		def parseXP(dis_id):
 			with self.client.db.get(ctx.guild.id) as db:
-				row = db.execute("SELECT xp, level FROM leveldata WHERE userId = ?", (disid,)).fetchall()
-				return disid, row[0][1], row[0][0], self.levels[row[0][1] + 1]
+				row = db.execute("SELECT xp, level FROM leveldata WHERE userId = ?", (dis_id,)).fetchall()
+				return dis_id, row[0][1], row[0][0], self.levels[row[0][1] + 1]
+		
 		try:
-			disid, lev, xpx, xptickm = parseXP(userid)
+			disid, lev, xpx, xptick = parseXP(userid)
 		except BaseException:
 			await ctx.send("UserID konnte nicht gefunden werden!")
 		else:
-			if disid == ctx.author.id:
-				await ctx.send(embed=discord.Embed(
-					title=f'Deine aktuellen Stats:',
-					description=f'Level: **{lev}**\nXP: **{xpx}**\nNächstes Level ab XP: **{xptickm}**'))
+			balken = ""
+			percent = round(xpx / xptick, 4)
+			for i in range(0, 10):
+				if i / 10 < percent < (i + 1) / 10:
+					balken += ":blue_square:"
+				elif i / 10 < percent:
+					balken += ":green_square:"
+				else:
+					balken += ":red_square:"
+			
+			description = f"**{lev}** {balken} **{lev + 1}**\nXP Fortschritt: **{percent * 100}%** {xpx}/{xptick}"
+			if userid == ctx.author.id:
+				title = "Dein Fortschritt"
 			else:
-				await ctx.send(embed=discord.Embed(
-					title=f'Daten von User: {self.client.get_user(disid)}',
-					description=f'Level: **{lev}**\nXP: **{xpx}**\nNächstes Level ab XP: **{xptickm}**'))
+				title = f"Fortschritt von User {disid}"
+			await ctx.send(
+				embed=discord.Embed(
+					title=title,
+					description=description))
 		finally:
 			pass
-		
+	
 	@commands.Cog.listener()
 	async def on_message(self, ctx):
 		# Ignore DMs
@@ -76,7 +89,8 @@ class Xp(commands.Cog):
 				return
 		except KeyError:
 			pass
-		# TODO: Cooldown#
+		
+		# Cooldown
 		if ctx.guild.id not in self.cooldowns.keys():
 			self.cooldowns[ctx.guild.id] = dict()
 		self.cooldowns[ctx.guild.id][ctx.author.id] = t.time()
@@ -92,18 +106,18 @@ class Xp(commands.Cog):
 				x = round(get_text_xp(len(ctx.content)), 2)
 				lev = 0
 			else:
-				x = round(float(old[0][0]) + get_text_xp(len(ctx.content)), 2)
+				x = float(old[0][0]) + get_text_xp(len(ctx.content))
 				oldlev = self.get_level(old[0][0])
 				lev = self.get_level(x)
 			db.execute("INSERT OR REPLACE INTO leveldata (userId, level, xp) VALUES (?, ?, ?)", (ctx.author.id, lev, x))
 			if oldlev < lev:
-				await ctx.channel.send(f"LEVEL UP! Du bist nun Level {lev} <@{ctx.author.id}")
-
+				await ctx.channel.send(f":partying_face: LEVEL UP! Du bist nun Level {lev} <@{ctx.author.id}> :tada:")
+	
 	@commands.Cog.listener()
 	async def on_member_join(self, member):
 		with self.client.db.get(member.guild.id) as db:
 			db.execute("INSERT OR REPLACE INTO leveldata (userId, level, xp) VALUES (?, ?, ?)", (member.id, 0, 0))
-
+	
 	@commands.Cog.listener()
 	async def on_member_leave(self, member):
 		with self.client.db.get(member.guild.id) as db:
