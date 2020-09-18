@@ -6,6 +6,7 @@ from discord.ext import commands
 ADDITIONALXP = 20
 BASEXP = 100
 COOLDOWN_TIME = 60
+voice_states = dict()
 
 
 # Returns a Level to a certain xp amount
@@ -26,14 +27,20 @@ def get_text_xp(length):
 		return round((r.randint(100, 1000) + length) / (2222 - length), 2)
 
 
+def get_voice_xp(seconds):
+	return round(seconds / 60 * r.randint(30, 70) / 20, 2)
+
+
 class Xp(commands.Cog):
 	
 	def __init__(self, client):
 		self.levels = [xp(lev) for lev in range(0, 250)]
 		self.client = client
 		self.cooldowns = dict()
-	
+
 	# TODO: "Garbage-Collector" der cooldowns cleart
+	def finish_xp(self):
+		print("Finish")
 	
 	def get_level(self, userxp):
 		if userxp < self.levels[0]:
@@ -41,17 +48,17 @@ class Xp(commands.Cog):
 		for lev, x in enumerate(self.levels):
 			if userxp < x:
 				return lev - 1
-	
+
 	@commands.command()
 	async def xp(self, ctx, userid=None):
 		if userid is None:
 			userid = ctx.author.id
-		
+
 		def parseXP(dis_id):
 			with self.client.db.get(ctx.guild.id) as db:
 				row = db.execute("SELECT xp, level FROM leveldata WHERE userId = ?", (dis_id,)).fetchall()
 				return dis_id, row[0][1], row[0][0], self.levels[row[0][1] + 1]
-		
+
 		try:
 			disid, lev, xpx, xptick = parseXP(userid)
 		except BaseException:
@@ -66,19 +73,12 @@ class Xp(commands.Cog):
 					balken += ":green_square:"
 				else:
 					balken += ":red_square:"
-			
-			description = f"**{lev}** {balken} **{lev + 1}**\nXP Fortschritt: **{percent * 100}%** {xpx}/{xptick}"
-			if userid == ctx.author.id:
-				title = "Dein Fortschritt"
-			else:
-				title = f"Fortschritt von User {disid}"
 			await ctx.send(
 				embed=discord.Embed(
-					title=title,
-					description=description))
-		finally:
-			pass
-	
+					title="Dein Fortschritt" if userid == ctx.author.id else f"Fortschritt von User {disid}",
+					description=
+					f"**{lev}** {balken} **{lev + 1}**\nXP Fortschritt: **{round(percent * 100, 2)}%** {xpx}/{xptick}"))
+
 	@commands.Cog.listener()
 	async def on_message(self, ctx):
 		# Ignore DMs
@@ -112,17 +112,69 @@ class Xp(commands.Cog):
 			db.execute("INSERT OR REPLACE INTO leveldata (userId, level, xp) VALUES (?, ?, ?)", (ctx.author.id, lev, x))
 			if oldlev < lev:
 				await ctx.channel.send(f":partying_face: LEVEL UP! Du bist nun Level {lev} <@{ctx.author.id}> :tada:")
-	
+
 	@commands.Cog.listener()
 	async def on_member_join(self, member):
 		with self.client.db.get(member.guild.id) as db:
 			db.execute("INSERT OR REPLACE INTO leveldata (userId, level, xp) VALUES (?, ?, ?)", (member.id, 0, 0))
-	
+
 	@commands.Cog.listener()
 	async def on_member_leave(self, member):
 		with self.client.db.get(member.guild.id) as db:
 			db.execute("DELETE FROM leveldata WHERE userId LIKE ?", (member.id,))
 
+	@commands.Cog.listener()
+	async def on_voice_state_update(self, member, before, after):
+		if member.guild.id not in voice_states.keys():
+			voice_states[member.guild.id] = dict()
 
+		def put_user_in():
+			if member.id in voice_states[member.guild.id]:
+				return
+			voice_states[member.guild.id][member.id] = t.time()
+
+		async def del_user():
+			try:
+				voice_time = t.time() - voice_states[member.guild.id][member.id]
+				voice_states[member.guild.id].pop(member.id)
+			except KeyError:
+				return
+			if voice_time < 30:
+				return
+			xp = get_voice_xp(voice_time)
+			with self.client.db.get(member.guild.id) as db:
+				old = db.execute("SELECT xp FROM leveldata WHERE userId = ?", (member.id,)).fetchall()
+				oldlev = 0
+				if len(old) == 0:
+					lev = 0
+				else:
+					xp = float(old[0][0]) + xp
+					oldlev = self.get_level(old[0][0])
+					lev = self.get_level(xp)
+				db.execute("INSERT OR REPLACE INTO leveldata (userId, level, xp) VALUES (?, ?, ?)",
+				           (member.id, lev, xp))
+				
+				if oldlev < lev:
+					if member.dm_channel is None:
+						await member.create_dm()
+					try:
+						await member.dm_channel.send(
+							f":partying_face: LEVEL UP! Du bist nun Level {lev} <@{member.id}> :tada:")
+					except Exception:
+						pass
+
+		if after.channel is None or after.self_mute or after.self_deaf or after.afk:
+			await del_user()
+		else:
+			put_user_in()
+		
+		
 def setup(client):
+	voice_states.clear()
 	client.add_cog(Xp(client))
+
+
+def teardown(client):
+	print("TEARDOWN")
+	
+	voice_states.clear()

@@ -86,23 +86,37 @@ class Logging(commands.Cog):
 			self.client.send(logch, string)
 		except Exception:
 			pass
-	
+
 	# Voice-Änderungen
 	@commands.Cog.listener()
 	async def on_voice_state_update(self, member, before, after):
 		if member is None or member.guild is None:
 			return
-		with self.get_logchannel(member.guild.id) as logch:
-			if before.channel is None:
-				await logch.send(
-					f":mega: **{member} ({member.id})** hat den Voice Channel **{before.channel}** verlassen.")
-			elif before.channel is not None and after.channel is None:
-				await logch.send(
-					f":mega: **{member} ({member.id})** hat den Voice Channel **{before.channel}** verlassen.")
-			elif before.channel is not None and after.channel is not None:
-				await logch.send(
-					f":mega: **{member} ({member.id} )** hat den Voice Channel von ** {before.channel} ** zu ** "
-					f"{after.channel}** gewechselt.")
+		logch = self.get_logchannel(member.guild.id)
+		if logch is None:
+			return
+		logch = self.client.get_channel(int(logch))
+		if before.channel is None:
+			await logch.send(
+				f":mega: **{member} ({member.id})** hat den Voice Channel **{after.channel}** betreten.")
+		elif before.channel is not None and after.channel is None:
+			await logch.send(
+				f":mega: **{member} ({member.id})** hat den Voice Channel **{before.channel}** verlassen.")
+		elif before.channel != after.channel:
+			await logch.send(
+				f":mega: **{member} ({member.id} )** hat den Voice Channel von ** {before.channel} ** zu ** "
+				f"{after.channel}** gewechselt.")
+		else:
+			if before.self_deaf != after.self_deaf:
+				if before.self_deaf:
+					await logch.send(f':microphone2: **{member} ({member.id})** hat seine Kopfhöhrer entmutet')
+				else:
+					await logch.send(f':microphone2: **{member} ({member.id})** hat seine Kopfhöhrer gemutet')
+			if before.self_mute != after.self_mute:
+				if before.self_mute:
+					await logch.send(f':microphone2: **{member} ({member.id})** hat sein Mikrofon entmutet')
+				else:
+					await logch.send(f':microphone2: **{member} ({member.id})** hat sein Mikrofon gemutet')
 
 
 def setup(client):
