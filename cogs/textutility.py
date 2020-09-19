@@ -18,7 +18,7 @@ class TextUtility(commands.Cog):
 	def cog_unload(self):
 		self.themen_garbage_collector.cancel()
 	
-	@tasks.loop(seconds=10)
+	@tasks.loop(hours=1)
 	async def themen_garbage_collector(self):
 		now = dt.datetime.utcnow()
 		
@@ -30,7 +30,7 @@ class TextUtility(commands.Cog):
 			if len(archive.voice_channels) > 0:
 				for voice_channel in archive.voice_channels:
 					await voice_channel.delete()
-			elif len(archive.channels) >= 20:
+			elif len(archive.channels) >= 50:
 				del_channel, time = 0, now
 				for ch in archive.text_channels:
 					msg = await ch.history(limit=1).next()
@@ -68,18 +68,31 @@ class TextUtility(commands.Cog):
 			except IndexError:
 				pass
 		self.themen_garbage_collector.start()
-	
+
+	@commands.command()
+	@commands.is_owner()
+	async def fixthemen(self, ctx):
+		for g in self.client.guilds:
+			try:
+				self.topiccreate[g.id] = int(self.client.dbconf_get(g.id, "create"))
+				self.categorys[g.id] = int(self.client.dbconf_get(g.id, "category"))
+				self.archives[g.id] = int(self.client.dbconf_get(g.id, "archiv"))
+			except TypeError:
+				pass
+			except IndexError:
+				pass
+		self.themen_garbage_collector.start()
+
 	# Command to set Values in the Server Config
 	@commands.command()
 	@commands.has_permissions(administrator=True)
 	async def textchannel(self, ctx, key, value=""):
 		"""Setzt einen textchannel <key>, <value> nutze den Key help für eine übsericht aller Keys"""
-		
 		async def setchannel():
 			if not value.isnumeric():
 				raise ValueError
 			self.client.dbconf_set(ctx.guild.id, key, value)
-		
+
 		if key == "create":
 			await setchannel()
 			await ctx.send(f"{key.capitalize()}-Channel erfolgreich gesetzt!", delete_after=self.client.del_time_small)
@@ -103,9 +116,10 @@ class TextUtility(commands.Cog):
 	# wenn message im Topic Channel
 	@commands.Cog.listener()
 	async def on_message(self, message):
-		if message.guild is None or message.author.id == self.client.user.id or message.guild.id not in self.topiccreate:
+		if message.guild is None or message.author.id == self.client.user.id or \
+				message.guild.id not in self.topiccreate.keys() or \
+				message.guild.id not in self.archives.keys():
 			return
-		
 		elif message.channel.category_id == self.archives[message.guild.id]:
 			category = message.guild.get_channel(self.categorys[message.guild.id])
 			if len(category.channels) < 20:

@@ -76,6 +76,7 @@ async def ping(ctx):
 @client.command()
 @commands.is_owner()
 async def status(ctx, *, status_text):
+	"""Setzt den Status des Bots"""
 	await client.change_presence(status=discord.Status.online, activity=discord.Game(status_text))
 	await ctx.send(f'Der Status lautet nun: **{status_text}**', delete_after=client.del_time_long)
 
