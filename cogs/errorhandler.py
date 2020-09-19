@@ -39,6 +39,8 @@ class ErrorHandler(commands.Cog):
 		# DiscordErrors
 		elif isinstance(error, commands.CommandError):
 			await ctx.send(f"Irgendwas funktioniert da nicht ganz...{error} {type(error)} <@!137291894953607168>")
+		elif isinstance(error, ValueError):
+			await ctx.send(f'Diese Value ist nicht gültig!')
 		# Sonstige Errors
 		else:
 			await ctx.send(f"Ein unerwarteter Fehler ist aufgetreten! \n{error} {type(error)} <@!137291894953607168>")

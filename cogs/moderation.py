@@ -12,6 +12,7 @@ class Moderation(commands.Cog):
 	@commands.has_permissions(manage_messages=True)
 	async def clear(self, ctx, amount=10):
 		"""Löscht den gewählten Amount an Nachrichten Standardmenge: 10"""
+		await ctx.channel.purge(limit=int(amount))
 		await ctx.send(f"Es wurden **{amount}** Nachrichten gelöscht.", delete_after=self.client.del_time_mid)
 
 	@commands.command()

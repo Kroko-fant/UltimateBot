@@ -5,7 +5,7 @@ from discord.ext import commands
 
 ADDITIONALXP = 20
 BASEXP = 100
-COOLDOWN_TIME = 60
+COOLDOWN_TIME = 30
 voice_states = dict()
 
 
@@ -37,7 +37,7 @@ class Xp(commands.Cog):
 		self.levels = [xp(lev) for lev in range(0, 250)]
 		self.client = client
 		self.cooldowns = dict()
-
+	
 	# TODO: "Garbage-Collector" der cooldowns cleart
 	def finish_xp(self):
 		print("Finish")
@@ -48,17 +48,17 @@ class Xp(commands.Cog):
 		for lev, x in enumerate(self.levels):
 			if userxp < x:
 				return lev - 1
-
+	
 	@commands.command()
 	async def xp(self, ctx, userid=None):
 		if userid is None:
 			userid = ctx.author.id
-
+		
 		def parseXP(dis_id):
 			with self.client.db.get(ctx.guild.id) as db:
 				row = db.execute("SELECT xp, level FROM leveldata WHERE userId = ?", (dis_id,)).fetchall()
 				return dis_id, row[0][1], row[0][0], self.levels[row[0][1] + 1]
-
+		
 		try:
 			disid, lev, xpx, xptick = parseXP(userid)
 		except BaseException:
@@ -77,8 +77,9 @@ class Xp(commands.Cog):
 				embed=discord.Embed(
 					title="Dein Fortschritt" if userid == ctx.author.id else f"Fortschritt von User {disid}",
 					description=
-					f"**{lev}** {balken} **{lev + 1}**\nXP Fortschritt: **{round(percent * 100, 2)}%** {xpx}/{xptick}"))
-
+					f"**{lev}** {balken} **{lev + 1}**\nXP Fortschritt: **{round(percent * 100, 2)}%**"
+					f" {round(xpx, 2)}/{xptick}"))
+	
 	@commands.Cog.listener()
 	async def on_message(self, ctx):
 		# Ignore DMs
@@ -112,27 +113,27 @@ class Xp(commands.Cog):
 			db.execute("INSERT OR REPLACE INTO leveldata (userId, level, xp) VALUES (?, ?, ?)", (ctx.author.id, lev, x))
 			if oldlev < lev:
 				await ctx.channel.send(f":partying_face: LEVEL UP! Du bist nun Level {lev} <@{ctx.author.id}> :tada:")
-
+	
 	@commands.Cog.listener()
 	async def on_member_join(self, member):
 		with self.client.db.get(member.guild.id) as db:
 			db.execute("INSERT OR REPLACE INTO leveldata (userId, level, xp) VALUES (?, ?, ?)", (member.id, 0, 0))
-
+	
 	@commands.Cog.listener()
 	async def on_member_leave(self, member):
 		with self.client.db.get(member.guild.id) as db:
 			db.execute("DELETE FROM leveldata WHERE userId LIKE ?", (member.id,))
-
+	
 	@commands.Cog.listener()
 	async def on_voice_state_update(self, member, before, after):
 		if member.guild.id not in voice_states.keys():
 			voice_states[member.guild.id] = dict()
-
+		
 		def put_user_in():
 			if member.id in voice_states[member.guild.id]:
 				return
 			voice_states[member.guild.id][member.id] = t.time()
-
+		
 		async def del_user():
 			try:
 				voice_time = t.time() - voice_states[member.guild.id][member.id]
@@ -151,8 +152,8 @@ class Xp(commands.Cog):
 					xp = float(old[0][0]) + xp
 					oldlev = self.get_level(old[0][0])
 					lev = self.get_level(xp)
-				db.execute("INSERT OR REPLACE INTO leveldata (userId, level, xp) VALUES (?, ?, ?)",
-				           (member.id, lev, xp))
+				db.execute(
+					"INSERT OR REPLACE INTO leveldata (userId, level, xp) VALUES (?, ?, ?)", (member.id, lev, xp))
 				
 				if oldlev < lev:
 					if member.dm_channel is None:
@@ -162,13 +163,13 @@ class Xp(commands.Cog):
 							f":partying_face: LEVEL UP! Du bist nun Level {lev} <@{member.id}> :tada:")
 					except Exception:
 						pass
-
+		
 		if after.channel is None or after.self_mute or after.self_deaf or after.afk:
 			await del_user()
 		else:
 			put_user_in()
-		
-		
+
+
 def setup(client):
 	voice_states.clear()
 	client.add_cog(Xp(client))
@@ -176,5 +177,5 @@ def setup(client):
 
 def teardown(client):
 	print("TEARDOWN")
-	
+	# TODO TEARDOWN
 	voice_states.clear()

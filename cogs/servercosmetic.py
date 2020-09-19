@@ -6,19 +6,20 @@ class ServerCosmetic(commands.Cog):
 
 	def __init__(self, client):
 		self.client = client
-
+	
+	# Command to set Values in the Server Config
 	@commands.command()
 	@commands.has_permissions(administrator=True)
 	async def set(self, ctx, key, value=""):
 		"""Setze eine Variable auf einen bestimmten Wert. Für Hilfe welche Variablen es gibt gebe !set help ein."""
 		
-		async def setchannel(k):
+		async def setchannel():
 			if not value.isnumeric():
 				raise ValueError
 			self.client.dbconf_set(ctx.guild.id, key, value)
 			
 		if key in ["prefix", "bump", "logchannel", "botlog", "invitelog"]:
-			await setchannel(key)
+			await setchannel()
 			await ctx.send(f"{key.capitalize()}-Channel erfolgreich gesetzt!", delete_after=self.client.del_time_small)
 		elif key == "prefix":
 			self.client.dbconf_set(ctx.guild.id, key, value)

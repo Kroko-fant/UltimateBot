@@ -58,6 +58,8 @@ async def reload_modules(ctx):
 
 @client.event
 async def on_ready():
+	print(f'{client.user} ist jetzt online')
+	print(f'Bot läuft auf {len(client.guilds)} Servern')
 	await client.change_presence(status=discord.Status.online, activity=discord.Game('Bot online und bereit'))
 	for g in client.guilds:
 		client.prefixes[g.id] = client.dbconf_get(g.id, 'prefix', '!')
@@ -148,7 +150,5 @@ async def on_command_error(ctx, error, force=False):
 
 
 print("Botstart abgeschlossen!")
-print(f'{client.user} ist jetzt online')
-print(f'Bot läuft auf {len(client.guilds)} Servern')
 load_modules()
 client.run(SECRETS.TOKEN)
