@@ -34,6 +34,15 @@ class CustomClient(Bot):
 		for i in contentlist:
 			await sendable.send(i)
 	
+	async def send_dm(self, member, content):
+		if member.dm_channel is None:
+			await member.create_dm()
+		try:
+			await member.dm_channel.send(content)
+			return True
+		except Exception:
+			return False
+	
 	async def delete_cmd(self, ctx):
 		if ctx.guild is None:
 			return

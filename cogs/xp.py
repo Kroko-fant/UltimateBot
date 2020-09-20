@@ -22,9 +22,9 @@ def xp(input_level, k=0):
 
 def get_text_xp(length):
 	if length < 10:
-		return r.randint(0, 100) / 50
+		return r.randint(0, 100) / 100
 	else:
-		return round((r.randint(100, 1000) + length) / (2222 - length), 2)
+		return round((r.randint(100, 1000) + length) / (2100 - length), 2) * 5
 
 
 def get_voice_xp(seconds):
@@ -142,28 +142,22 @@ class Xp(commands.Cog):
 				return
 			if voice_time < 30:
 				return
-			xp = get_voice_xp(voice_time)
+			voice_xp = get_voice_xp(voice_time)
 			with self.client.db.get(member.guild.id) as db:
 				old = db.execute("SELECT xp FROM leveldata WHERE userId = ?", (member.id,)).fetchall()
 				oldlev = 0
 				if len(old) == 0:
 					lev = 0
 				else:
-					xp = float(old[0][0]) + xp
+					voice_xp = float(old[0][0]) + voice_xp
 					oldlev = self.get_level(old[0][0])
-					lev = self.get_level(xp)
+					lev = self.get_level(voice_xp)
 				db.execute(
-					"INSERT OR REPLACE INTO leveldata (userId, level, xp) VALUES (?, ?, ?)", (member.id, lev, xp))
+					"INSERT OR REPLACE INTO leveldata (userId, level, xp) VALUES (?, ?, ?)", (member.id, lev, voice_xp))
 				
 				if oldlev < lev:
-					if member.dm_channel is None:
-						await member.create_dm()
-					try:
-						await member.dm_channel.send(
-							f":partying_face: LEVEL UP! Du bist nun Level {lev} <@{member.id}> :tada:")
-					except Exception:
-						pass
-		
+					await self.client.send_dm(
+						member, f":partying_face: LEVEL UP! Du bist nun Level {lev} <@{member.id}> :tada:")
 		if after.channel is None or after.self_mute or after.self_deaf or after.afk:
 			await del_user()
 		else:

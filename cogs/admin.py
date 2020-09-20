@@ -23,14 +23,8 @@ class Admin(commands.Cog):
 	@commands.command(aliases=["dm", "pm"])
 	@commands.is_owner()
 	async def senddm(self, ctx, user: discord.User, *, text):
-		if user.dm_channel is None:
-			await user.create_dm()
-		try:
-			await user.dm_channel.send(text)
-		except discord.DiscordException:
-			await ctx.message.add_reaction("⚠")
-			return
-		await ctx.message.add_reaction(self.client.get_emoji(634870836255391754))
+		result = await self.client.send_dm(user, text)
+		await ctx.message.add_reaction(self.client.get_emoji(634870836255391754) if result else "⚠")
 	
 	@commands.Cog.listener()
 	async def on_message(self, message):
@@ -39,15 +33,12 @@ class Admin(commands.Cog):
 		# DMs empfangen
 		if message.guild is None:
 			channel = self.client.get_channel(int(self.dmchannel))
-			content = f'**{message.author}** sagt: "{message.content}"'
+			content = f'**{message.author} ({message.author.id})** sagt: "{message.content}"'
 			await self.client.send(channel, content)
 		# DMs senden
 		elif message.channel.id == self.dmchannel and message.content[0:18].isnumeric():
-			await message.add_reaction("✅")
-			dmchannel = self.client.get_user(int(message.content[0:18]))
-			if dmchannel.dm_channel is None:
-				await dmchannel.create_dm()
-			await dmchannel.dm_channel.send(message.content[19:])
+			result = await self.client.send_dm(self.client.get_user(int(message.content[0:18])), message.content[19:])
+			await message.add_reaction(self.client.get_emoji(634870836255391754) if result else "⚠")
 	
 	@commands.command()
 	@commands.is_owner()
