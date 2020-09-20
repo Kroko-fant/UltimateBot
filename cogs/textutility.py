@@ -18,6 +18,18 @@ class TextUtility(commands.Cog):
 	def cog_unload(self):
 		self.themen_garbage_collector.cancel()
 	
+	def init_modul(self):
+		for g in self.client.guilds:
+			try:
+				self.topiccreate[g.id] = int(self.client.dbconf_get(g.id, "create"))
+				self.categorys[g.id] = int(self.client.dbconf_get(g.id, "category"))
+				self.archives[g.id] = int(self.client.dbconf_get(g.id, "archiv"))
+			except TypeError:
+				pass
+			except IndexError:
+				pass
+		self.themen_garbage_collector.start()
+	
 	@tasks.loop(hours=1)
 	async def themen_garbage_collector(self):
 		now = dt.datetime.utcnow()
@@ -58,30 +70,13 @@ class TextUtility(commands.Cog):
 	
 	@commands.Cog.listener()
 	async def on_ready(self):
-		for g in self.client.guilds:
-			try:
-				self.topiccreate[g.id] = int(self.client.dbconf_get(g.id, "create"))
-				self.categorys[g.id] = int(self.client.dbconf_get(g.id, "category"))
-				self.archives[g.id] = int(self.client.dbconf_get(g.id, "archiv"))
-			except TypeError:
-				pass
-			except IndexError:
-				pass
-		self.themen_garbage_collector.start()
+		self.init_modul()
 
 	@commands.command()
 	@commands.is_owner()
 	async def fixthemen(self, ctx):
-		for g in self.client.guilds:
-			try:
-				self.topiccreate[g.id] = int(self.client.dbconf_get(g.id, "create"))
-				self.categorys[g.id] = int(self.client.dbconf_get(g.id, "category"))
-				self.archives[g.id] = int(self.client.dbconf_get(g.id, "archiv"))
-			except TypeError:
-				pass
-			except IndexError:
-				pass
-		self.themen_garbage_collector.start()
+		self.init_modul()
+		await ctx.send("Themen gefixt!")
 
 	# Command to set Values in the Server Config
 	@commands.command()
@@ -109,9 +104,8 @@ class TextUtility(commands.Cog):
 			await ctx.send(
 				embed=discord.Embed(
 					title="Textchannel-Help",
-					description=
-					"create\tKanal zum erstellen von Kanälen\ncategory\tSetzt die Kategorie in welcher Kanäle erstellt"
-					" werden sollen\nauto-react\tSetzt einen Kanal für automatische Reaktionen"))
+					description="create\tKanal zum erstellen von Kanälen\ncategory\tSetzt die Kategorie in welcher "
+					"Kanäle erstellt werden sollen\nauto-react\tSetzt einen Kanal für automatische Reaktionen"))
 	
 	# wenn message im Topic Channel
 	@commands.Cog.listener()

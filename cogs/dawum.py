@@ -75,9 +75,8 @@ class Dawum(commands.Cog):
 		Der Ländercode ist optional. Alle Ländercodes sind intuitiv. Umfragenzahl"""
 		if parla.lower() == "help":
 			wahlhelfembed = discord.Embed(
-				description=
-				"Verwendung: !poll oder !poll <ländercode> <range>. Länderkürzel der deutschen Bundesländer, Bundestag"
-				" oder EU Range beliebig wählbar (<= 10) und es wird ein gemittelter Durchschnitt berechnet",
+				description="Verwendung: !poll oder !poll <ländercode> <range>. Länderkürzel der deutschen Bundesländer,"
+				" Bundestag oder EU Range beliebig wählbar (<= 10) und es wird ein gemittelter Durchschnitt berechnet",
 				title="Hilfe zum Befehl !poll", color=12370112)
 			await ctx.send(embed=wahlhelfembed, delete_after=self.client.del_time_mid)
 		else:

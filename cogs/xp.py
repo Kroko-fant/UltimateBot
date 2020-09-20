@@ -39,8 +39,8 @@ class Xp(commands.Cog):
 		self.cooldowns = dict()
 	
 	# TODO: "Garbage-Collector" der cooldowns cleart
-	def finish_xp(self):
-		print("Finish")
+	# def finish_xp(self):
+		# print("Finish")
 	
 	def get_level(self, userxp):
 		if userxp < self.levels[0]:
@@ -76,8 +76,7 @@ class Xp(commands.Cog):
 			await ctx.send(
 				embed=discord.Embed(
 					title="Dein Fortschritt" if userid == ctx.author.id else f"Fortschritt von User {disid}",
-					description=
-					f"**{lev}** {balken} **{lev + 1}**\nXP Fortschritt: **{round(percent * 100, 2)}%**"
+					description=f"**{lev}** {balken} **{lev + 1}**\nXP Fortschritt: **{round(percent * 100, 2)}%**"
 					f" {round(xpx, 2)}/{xptick}"))
 	
 	@commands.Cog.listener()
@@ -170,6 +169,5 @@ def setup(client):
 
 
 def teardown(client):
-	print("TEARDOWN")
 	# TODO TEARDOWN
 	voice_states.clear()

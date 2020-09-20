@@ -18,7 +18,7 @@ class Cosmetic(commands.Cog):
 	async def version(self, ctx):
 		"""Zeigt die aktuelle Bot-Version."""
 		await ctx.send(
-			f'Der Bot läuft auf :eyes~1: **Version Release 1.0**. Die API läuft auf Version :mailbox: '
+			f'Der Bot läuft auf :eyes~1: **Version Release 1.0.0**. Die API läuft auf Version :mailbox: '
 			f'**{discord.__version__}**', delete_after=self.client.del_time_mid)
 	
 	@commands.command()

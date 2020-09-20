@@ -8,62 +8,36 @@ class Logging(commands.Cog):
 	def get_logchannel(self, guild):
 		return self.client.dbconf_get(guild, 'logchannel')
 	
-	# Memberleave
-	@commands.Cog.listener()
-	async def on_member_join(self, member):
+	async def log_stuff(self, member, message):
 		try:
 			if member.client:
 				logchannelid = self.get_logchannel(member.guild.id)
 				if logchannelid is None:
 					return
 				logch = self.client.get_channel(int(logchannelid))
-				await logch.send(
-					f":inbox_tray: **{member}** ({member.id}) hat den Server betreten.")
+				await logch.send(message)
 		except Exception:
 			pass
+	
+	# Memberleave
+	@commands.Cog.listener()
+	async def on_member_join(self, member):
+		await self.log_stuff(member, f":inbox_tray: **{member}** ({member.id}) hat den Server betreten.")
 		
 	# Memberleave
 	@commands.Cog.listener()
 	async def on_member_remove(self, member):
-		try:
-			if member.client:
-				logchannelid = self.get_logchannel(member.guild.id)
-				if logchannelid is None:
-					return
-				logch = self.client.get_channel(int(logchannelid))
-				await logch.send(
-					f":outbox_tray: **{member}** ({member.id}) hat den Server verlassen.")
-		except Exception:
-			pass
+		await self.log_stuff(member, f":outbox_tray: **{member}** ({member.id}) hat den Server verlassen.")
 	
 	# Member wird gebannt
 	@commands.Cog.listener()
-	async def on_member_ban(self, guild, member):
-		try:
-			if not member.client:
-				logchannelid = self.get_logchannel(member.guild.id)
-				if logchannelid is None:
-					return
-				logch = self.client.get_channel(int(logchannelid))
-				await logch.send(f":no_entry_sign: **{member}** ({member.id}) wurde gebannt.")
-		except Exception:
-			pass
+	async def on_member_ban(self, _, member):
+		await self.log_stuff(member, f":no_entry_sign: **{member}** ({member.id}) wurde gebannt.")
 	
 	# Member wird entbannt
 	@commands.Cog.listener()
-	async def on_member_unban(self, guild, member):
-		try:
-			if not member.client:
-				logchannelid = self.get_logchannel(member.guild.id)
-				if logchannelid is None:
-					return
-				logch = self.client.get_channel(int(logchannelid))
-				await logch.send(
-					f":white_check_mark: **{member}** ({member.id}) wurde entgebannt.")
-			else:
-				pass
-		except Exception:
-			pass
+	async def on_member_unban(self, _, member):
+		await self.log_stuff(member, f":white_check_mark: **{member}** ({member.id}) wurde entgebannt.")
 	
 	# Nachricht löschen
 	@commands.Cog.listener()
