@@ -19,6 +19,9 @@ class Moderation(commands.Cog):
 	@commands.has_permissions(kick_members=True)
 	async def kick(self, ctx, member: discord.Member, *, reason="Kick-Befehl wurde benutzt"):
 		"""Kickt den User vom Server Syntax: {prefix}kick <@user>"""
+		if ctx.author.top_role <= member.top_role:
+			await ctx.send("Du kannst keine Leute kicken die einen gleich hohen/höheren Rang haben")
+			return
 		await member.kick(reason=reason)
 		await ctx.send(f"User **{member}** wurde gekickt.", delete_after=self.client.del_time_mid)
 
@@ -26,6 +29,9 @@ class Moderation(commands.Cog):
 	@commands.has_permissions(ban_members=True)
 	async def ban(self, ctx, member: discord.Member, *, reason=None):
 		"""Ban den User vom Server Syntax: {prefix}ban <@user>"""
+		if ctx.author.top_role <= member.top_role:
+			await ctx.send("Du kannst keine Leute bannen die einen gleich hohen/höheren Rang haben")
+			return
 		await member.ban(reason=reason)
 		await ctx.send(f"User **{member}** wurde gebannt.", delete_after=self.client.del_time_mid)
 	
@@ -36,7 +42,10 @@ class Moderation(commands.Cog):
 		members = list(dict.fromkeys(members))
 		members.remove("")
 		for m in members:
-			await ctx.guild.get_member(int(m)).ban(reason="Multiban")
+			member = ctx.guild.get_member(int(m))
+			if ctx.author.top_role <= member.top_role:
+				continue
+			await member.ban(reason="Multiban")
 
 
 def setup(client):

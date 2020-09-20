@@ -11,6 +11,9 @@ class CustomClient(Bot):
 		self.del_time_long = 60
 		self.prefixes = dict()
 	
+	def get_server_prefix(self, guildid):
+		return self.prefixes[guildid] if guildid in self.prefixes else "!"
+		
 	async def send(self, sendable, content):
 		if len(content) <= 2000:
 			await sendable.send(content)

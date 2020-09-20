@@ -75,9 +75,31 @@ class Xp(commands.Cog):
 					balken += ":red_square:"
 			await ctx.send(
 				embed=discord.Embed(
-					title="Dein Fortschritt" if userid == ctx.author.id else f"Fortschritt von User {disid}",
+					title=f"Fortschritt von User"
+					f" {str(self.client.get_user(disid))[:-5] if userid == ctx.author.id else str(ctx.author)[:-5]}",
 					description=f"**{lev}** {balken} **{lev + 1}**\nXP Fortschritt: **{round(percent * 100, 2)}%**"
 					f" {round(xpx, 2)}/{xptick}"))
+	
+	@commands.command()
+	async def top(self, ctx):
+		def get_index(input_index):
+			if input_index == 1:
+				return ":first_place:"
+			if input_index == 2:
+				return ":second_place:"
+			if input_index == 3:
+				return ":third_place:"
+			else:
+				return input_index
+
+		with self.client.db.get(ctx.guild.id) as db:
+			data = db.execute("SELECT * FROM leveldata ORDER BY xp DESC LIMIT 101").fetchall()
+			
+		description = "**Platz   User**"
+		for index, row in enumerate(data, 1):
+			description += f'\n{get_index(index)}  {str(self.client.get_user(row[0]))[:-5]}'
+		
+		await ctx.send(embed=discord.Embed(title=f"Rangliste von {ctx.guild}", description=description))
 	
 	@commands.Cog.listener()
 	async def on_message(self, ctx):
@@ -96,7 +118,7 @@ class Xp(commands.Cog):
 		self.cooldowns[ctx.guild.id][ctx.author.id] = t.time()
 		
 		# Ignore Commands
-		if ctx.content.startswith(self.client.prefixes[ctx.guild.id]):
+		if ctx.content.startswith(self.client.get_server_prefix(ctx.guild.id)):
 			return
 		
 		with self.client.db.get(ctx.guild.id) as db:

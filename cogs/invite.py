@@ -11,7 +11,7 @@ class Invite(commands.Cog):
 			asyncio.run_coroutine_threadsafe(self.update_invites(g), self.client.loop).result()
 	
 	def get_invitelog(self, guild):
-		return self.client.conf.get(guild, 'invitelog')
+		return self.client.dbconf_get(guild, 'invitelog')
 	
 	async def update_invites(self, guild):
 		self.invites[guild.id] = await guild.invites()
@@ -23,7 +23,10 @@ class Invite(commands.Cog):
 	@commands.Cog.listener()
 	async def on_member_join(self, member):
 		guild = member.guild
-		channel = self.client.get_channel(int(self.get_invitelog(guild.id)))
+		channelid = self.get_invitelog(guild.id)
+		if channelid is None:
+			return
+		channel = self.client.get_channel(int(channelid))
 		if channel is None:
 			return
 		new = await guild.invites()

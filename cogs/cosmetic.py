@@ -12,7 +12,7 @@ class Cosmetic(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_command(self, ctx):
-		await ctx.message.delete(delay=15)
+		await ctx.message.delete(delay=60)
 
 	@commands.command()
 	async def version(self, ctx):
