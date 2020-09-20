@@ -1,3 +1,4 @@
+import discord
 from discord.ext.commands import Bot
 
 
@@ -38,6 +39,8 @@ class CustomClient(Bot):
 			await sendable.send(i)
 	
 	async def send_dm(self, member, content):
+		if member.bot:
+			return
 		if member.dm_channel is None:
 			await member.create_dm()
 		try:
@@ -45,11 +48,6 @@ class CustomClient(Bot):
 			return True
 		except Exception:
 			return False
-	
-	async def delete_cmd(self, ctx):
-		if ctx.guild is None:
-			return
-		await ctx.channel.purge(limit=1)
 
 	async def unverified(self):
 		pass  # TODO
