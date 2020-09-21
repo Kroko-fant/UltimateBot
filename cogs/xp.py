@@ -56,9 +56,9 @@ class Xp(commands.Cog):
 		return vorstellen
 	
 	@commands.command()
-	async def xp(self, ctx, userid=None):
-		if userid is None:
-			userid = ctx.author.id
+	async def xp(self, ctx, user: discord.Member = None):
+		if user is None:
+			user = ctx.author
 		
 		def parseXP(dis_id):
 			with self.client.db.get(ctx.guild.id) as db:
@@ -66,7 +66,7 @@ class Xp(commands.Cog):
 				return dis_id, row[0][1], row[0][0], self.levels[row[0][1] + 1]
 		
 		try:
-			disid, lev, xpx, xptick = parseXP(userid)
+			disid, lev, xpx, xptick = parseXP(user.id)
 		except BaseException:
 			await ctx.send("UserID konnte nicht gefunden werden!")
 		else:
@@ -81,8 +81,7 @@ class Xp(commands.Cog):
 					balken += ":red_square:"
 			await ctx.send(
 				embed=discord.Embed(
-					title=f"Fortschritt von User"
-					f" {str(self.client.get_user(disid))[:-5] if userid != ctx.author.id else str(ctx.author)[:-5]}",
+					title=f"Fortschritt von {str(user)[:-5]}",
 					description=f"**{lev}** {balken} **{lev + 1}**\nXP Fortschritt: **{round(percent * 100, 2)}%**"
 					f" {round(xpx, 2)}/{xptick}"))
 	
@@ -99,7 +98,7 @@ class Xp(commands.Cog):
 				return f"**{input_index}**"
 		
 		with self.client.db.get(ctx.guild.id) as db:
-			data = db.execute("SELECT * FROM leveldata ORDER BY xp DESC LIMIT 101").fetchall()
+			data = db.execute("SELECT * FROM leveldata ORDER BY xp DESC LIMIT 10").fetchall()
 		
 		description = "**Platz   User**"
 		for index, row in enumerate(data, 1):

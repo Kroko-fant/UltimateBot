@@ -115,7 +115,6 @@ async def reload(ctx, extension):
 async def shutdown(ctx):
 	"""Fährt den Bot herunter.
 	Danach muss man ihn auf dem Server in der Console neustarten lol."""
-	await client.delete_cmd(ctx)
 	await ctx.send("Bot wird heruntergefahren...")
 	await client.logout()
 
