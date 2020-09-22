@@ -34,7 +34,10 @@ class ErrorHandler(commands.Cog):
 			await ctx.send(f"403-Forbidden Mir sind Hände und Füße gebunden ich habe keine Rechte!")
 		elif isinstance(error, discord.InvalidData):
 			await ctx.send(f'InvalidData - Discord hat mir komische Daten gesendet...')
-		elif isinstance(error, (discord.InvalidArgument, commands.BadArgument, commands.BadUnionArgument)):
+		elif isinstance(
+				error,
+				(discord.InvalidArgument, commands.BadArgument, commands.BadUnionArgument,
+					commands.errors.UnexpectedQuoteError, commands.errors.ExpectedClosingQuoteError)):
 			await ctx.send(f'Dieses Argument ist nicht erlaubt für diese Methode.')
 		# DiscordErrors
 		elif isinstance(error, commands.CommandError):

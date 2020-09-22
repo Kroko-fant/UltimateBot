@@ -24,7 +24,7 @@ def get_text_xp(length):
 	if length < 10:
 		return r.randint(0, 100) / 100
 	else:
-		return round((r.randint(100, 1000) + length) / (2100 - length), 2) * 5
+		return round((r.randint(100, 1000) + length) / (2100 - length) * 5, 2)
 
 
 def get_voice_xp(seconds):
@@ -98,11 +98,18 @@ class Xp(commands.Cog):
 				return f"**{input_index}**"
 		
 		with self.client.db.get(ctx.guild.id) as db:
-			data = db.execute("SELECT * FROM leveldata ORDER BY xp DESC LIMIT 10").fetchall()
+			data = db.execute("SELECT * FROM leveldata ORDER BY level DESC, xp DESC LIMIT 20").fetchall()
 		
 		description = "**Platz   User**"
+		offset = 0
 		for index, row in enumerate(data, 1):
-			description += f'\n{get_index(index)}  {str(self.client.get_user(row[0]))[:-5]}'
+			user = self.client.get_user(row[0])
+			if index == 11 + offset:
+				break
+			if user.bot:
+				offset += 1
+				continue
+			description += f'\n{get_index(index - offset)}  {str(user)[:-5]}'
 		
 		await ctx.send(embed=discord.Embed(title=f"Rangliste von {ctx.guild}", description=description))
 
@@ -138,11 +145,6 @@ class Xp(commands.Cog):
 		# Ignore DMs
 		if ctx.guild is None or ctx.guild.id is None:
 			return
-		try:
-			if t.time() - self.cooldowns[ctx.guild.id][ctx.author.id] < 60:
-				return
-		except KeyError:
-			pass
 		
 		if str(ctx.channel.id) == self.get_vorstellen(ctx.guild.id):
 			role_name = self.client.dbconf_get(ctx.guild.id, "vorgestellt")
@@ -158,6 +160,12 @@ class Xp(commands.Cog):
 				else:
 					await add_xp(bonusxp=100, force_dm=True)
 					return
+		
+		try:
+			if t.time() - self.cooldowns[ctx.guild.id][ctx.author.id] < COOLDOWN_TIME:
+				return
+		except KeyError:
+			pass
 		
 		# Cooldown
 		if ctx.guild.id not in self.cooldowns.keys():

@@ -46,7 +46,8 @@ class Fun(commands.Cog):
 		Hat x keinen Wert bekommt x automatisch 100 zugewiesen."""
 		if int2 <= 0:
 			await ctx.send("Deine Zahl sollte größer als 0 sein!")
-		await self.client.send(ctx, f"Deine Nummer zwischen 0 und {int2} lautet: **{random.randint(0, int2)}**")
+		else:
+			await self.client.send(ctx, f"Deine Nummer zwischen 0 und {int2} lautet: **{random.randint(0, int2)}**")
 	
 	@commands.command()
 	async def card(self, ctx):

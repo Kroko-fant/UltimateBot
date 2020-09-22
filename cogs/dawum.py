@@ -23,8 +23,12 @@ def umfrage_ausgeben(parlacode, count):
 		'Die Partei': 13, 'SSW': 10, 'Bayernpartei': 11, 'Tierschutz': 15, 'Bürger in Wut': 16, 'Sonstige': 0}
 	data = json.loads(urllib.request.urlopen("https://api.dawum.de/").read())
 	if parlacode.isdigit():
-		umfragenid = [parlacode] if int(parlacode) > 100 \
-			else [int(k) for k, v in data['Surveys'].items() if v['Parliament_ID'] == str(parlacode.lower())]
+		parlacode = int(parlacode)
+		if not (-1 < parlacode):
+			return None
+		
+		umfragenid = [parlacode] if int(parlacode) > 18 \
+			else [int(k) for k, v in data['Surveys'].items() if v['Parliament_ID'] == str(parlacode)]
 	else:
 		if parlacode not in parlamentcodes:
 			return None
@@ -80,6 +84,10 @@ class Dawum(commands.Cog):
 				title="Hilfe zum Befehl !poll", color=12370112)
 			await ctx.send(embed=wahlhelfembed, delete_after=self.client.del_time_mid)
 		else:
+			if count < 1:
+				await ctx.send(embed=discord.Embed(
+					title="Error!", description="Count muss >= 1 sein"))
+				return
 			result = umfrage_ausgeben(parla, int(count))
 			if result is None:
 				await ctx.send(embed=discord.Embed(

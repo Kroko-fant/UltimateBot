@@ -149,8 +149,13 @@ class TextUtility(commands.Cog):
 						f"bitte ihn eine Kategorie mit {self.client.prefixes[message.guild.id]}textchannel kategorie "
 						f"zu setzen. Oder diesen Kanal als Themen-Erstellungskanal zu entfernen.",
 						delete_after=self.client.del_time_long)
+				except discord.HTTPException:
+					# TODO: Handle full category
+					await message.channel.send(
+						"Konnte den Kanal nicht erstellen. Bitte überprüfe deinen Kanalnamen./Die Kategorie ist voll. "
+						"Es können keine weiteren Kanäle erstellt werden", delete_after=self.client.del_time_mid)
 				except discord.DiscordException:
-					await message.send(
+					await message.channel.send(
 						"Konnte den Kanal nicht erstellen. Bitte überprüfe deinen Kanalnamen.",
 						delete_after=self.client.del_time_mid)
 
