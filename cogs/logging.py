@@ -10,7 +10,7 @@ class Logging(commands.Cog):
 	
 	async def log_stuff(self, member, message):
 		try:
-			if member.client:
+			if not member.bot:
 				logchannelid = self.get_logchannel(member.guild.id)
 				if logchannelid is None:
 					return
@@ -48,18 +48,17 @@ class Logging(commands.Cog):
 		if logchannelid is None:
 			return
 		logch = self.client.get_channel(int(logchannelid))
-		try:
-			ch = payload.channel_id
-			msg = payload.message_id
-			content = payload.cached_message.clean_content
-			member = payload.cached_message.author
-			channel = payload.cached_message.channel
-			string = \
-				f":rcycle: Nachricht ({msg.id}) von **{member}** ({member.id}) in Channel **{channel}** ({ch}) " \
-				f"gelöscht mit dem Inhalt:\n{content}"
-			self.client.send(logch, string)
-		except Exception:
-			pass
+		
+		if payload.cached_message is None:
+			await self.client.send(
+				logch, f":recycle: Nachricht in {payload.message_id} gelöscht. Content nicht mehr im Cache.")
+			return
+		content = payload.cached_message.clean_content
+		member = payload.cached_message.author
+		channel = payload.cached_message.channel
+		string = f":recycle: Nachricht ({payload.message_id}) von **{member}** ({member.id}) in Channel" \
+			f" **{channel}** ({payload.channel_id}) gelöscht mit dem Inhalt:\n{content}"
+		await self.client.send(logch, string)
 
 	# Voice-Änderungen
 	@commands.Cog.listener()

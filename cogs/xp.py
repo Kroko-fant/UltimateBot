@@ -28,7 +28,7 @@ def get_text_xp(length):
 
 
 def get_voice_xp(seconds):
-	return round(seconds / 60 * r.randint(30, 70) / 20, 2)
+	return round(seconds / 60 * r.randint(40, 60) / 25, 2)
 
 
 class Xp(commands.Cog):
@@ -193,22 +193,22 @@ class Xp(commands.Cog):
 		if member.guild.id not in voice_states.keys():
 			voice_states[member.guild.id] = dict()
 		
-		def put_user_in():
-			if member.id in voice_states[member.guild.id]:
+		def put_user_in(in_member=member):
+			if in_member.id in voice_states[in_member.guild.id]:
 				return
-			voice_states[member.guild.id][member.id] = t.time()
+			voice_states[in_member.guild.id][in_member.id] = t.time()
 		
-		async def del_user():
+		async def del_user(del_member=member):
 			try:
-				voice_time = t.time() - voice_states[member.guild.id][member.id]
-				voice_states[member.guild.id].pop(member.id)
+				voice_time = t.time() - voice_states[del_member.guild.id][del_member.id]
+				voice_states[del_member.guild.id].pop(del_member.id)
 			except KeyError:
 				return
 			if voice_time < 30:
 				return
-			voice_xp =  round(get_voice_xp(voice_time), 2)
-			with self.client.db.get(member.guild.id) as db:
-				old = db.execute("SELECT xp, level FROM leveldata WHERE userId = ?", (member.id,)).fetchall()
+			voice_xp = round(get_voice_xp(voice_time), 2)
+			with self.client.db.get(del_member.guild.id) as db:
+				old = db.execute("SELECT xp, level FROM leveldata WHERE userId = ?", (del_member.id,)).fetchall()
 				oldlev = 0
 				if len(old) != 0:
 					voice_xp =float(old[0][0]) + voice_xp
@@ -222,16 +222,21 @@ class Xp(commands.Cog):
 					old_max_xp = self.levels[lev + 1]
 				
 				db.execute(
-					"INSERT OR REPLACE INTO leveldata (userId, level, xp) VALUES (?, ?, ?)", (member.id, lev, voice_xp))
+					"INSERT OR REPLACE INTO leveldata (userId, level, xp) VALUES (?, ?, ?)", (del_member.id, lev, voice_xp))
 				
 				if oldlev < lev:
 					await self.client.send_dm(
-						member, f":partying_face: LEVEL UP! Du bist nun Level {lev} <@{member.id}> :tada:")
-		
+						del_member, f":partying_face: LEVEL UP! Du bist nun Level {lev} <@{del_member.id}> :tada:")
+
 		if after.channel is None or after.self_mute or after.self_deaf or after.afk:
 			await del_user()
+			if before.channel is not None and len(before.channel.members) == 1:
+				await del_user(del_member=before.channel.members[0])
+		elif len(after.channel.members) == 1:
+			await del_user(after.channel.members[0])
 		else:
-			put_user_in()
+			for member in after.channel.members:
+				put_user_in(in_member=member)
 
 
 def setup(client):
