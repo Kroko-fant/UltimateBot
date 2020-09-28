@@ -75,6 +75,7 @@ class TextUtility(commands.Cog):
 	@commands.command()
 	@commands.is_owner()
 	async def fixthemen(self, ctx):
+		"""Behebt fehler, wenn das Modul nicht richtig initialisiert wurde."""
 		self.init_modul()
 		await ctx.send("Themen gefixt!")
 

@@ -13,6 +13,7 @@ class Admin(commands.Cog):
 	@commands.command()
 	@commands.is_owner()
 	async def send(self, ctx, ch: discord.TextChannel, *, text):
+		"""Sendet eine Nachricht in einen Channel."""
 		try:
 			await ch.send(text)
 		except discord.DiscordException:
@@ -23,6 +24,7 @@ class Admin(commands.Cog):
 	@commands.command(aliases=["dm", "pm"])
 	@commands.is_owner()
 	async def senddm(self, ctx, user: discord.User, *, text):
+		"""Sendet eine DM Nachricht"""
 		result = await self.client.send_dm(user, text)
 		await ctx.message.add_reaction(self.client.get_emoji(634870836255391754) if result else "⚠")
 	
