@@ -64,6 +64,7 @@ def umfrage_ausgeben(parlacode, count):
 	for ids in range(count):
 		newids.append(max(umfragenid))
 		umfragenid.remove(max(umfragenid))
+	
 	if count == 1:
 		output = f"von **{data['Institutes'][data['Surveys'][str(newids[0])]['Institute_ID']]['Name']}" \
 			f"** am {data['Surveys'][str(newids[0])]['Date']}\n"

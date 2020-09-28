@@ -55,8 +55,9 @@ class Xp(commands.Cog):
 			return None
 		return vorstellen
 	
-	@commands.command()
+	@commands.command(aliases=["rank", "level"])
 	async def xp(self, ctx, user: discord.Member = None):
+		"""Zeigt die XP eines Users an."""
 		if user is None:
 			user = ctx.author
 		
@@ -85,8 +86,9 @@ class Xp(commands.Cog):
 					description=f"**{lev}** {balken} **{lev + 1}**\nXP Fortschritt: **{round(percent * 100, 2)}%**"
 					f" {round(xpx, 2)}/{xptick}"))
 	
-	@commands.command()
+	@commands.command(aliases=["ranklist", "rangliste", "leaderboard"])
 	async def top(self, ctx):
+		"""Zeigt die aktuelle Rangliste des Servers an"""
 		def get_index(input_index):
 			if input_index == 1:
 				return ":first_place:"
