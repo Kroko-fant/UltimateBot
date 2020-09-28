@@ -28,7 +28,7 @@ class ErrorHandler(commands.Cog):
 			if ctx.message.content[1:].startswith("bump") or ctx.message.content[1:].isnumeric() or \
 					ctx.message.content[1:].startswith("d bump") or ctx.message.content[1:].startswith("disboard"):
 				return
-			await self.client.send(f"Diesen Befehl ({ctx.command}) gibt es nicht :(")
+			await self.client.send(ctx, f"Den Befehl {ctx.message.content} gibt es nicht :(")
 		# Sonstige Errors
 		elif isinstance(error, discord.errors.Forbidden):
 			await ctx.send(f"403-Forbidden Mir sind Hände und Füße gebunden ich habe keine Rechte!")
