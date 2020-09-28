@@ -20,15 +20,15 @@ class ErrorHandler(commands.Cog):
 			return
 		# Missing Permissions
 		if isinstance(error, (commands.errors.MissingPermissions, commands.errors.NotOwner)):
-			await ctx.send("Dazu fehlen dir die Permissions :P")
+			await ctx.send(f"Du hast keine Rechte um {ctx.command} zu nutzen :P")
 		# Fehlendes erwartetes Argument
 		elif isinstance(error, commands.errors.MissingRequiredArgument):
-			await ctx.send("Fehlendes Argument! gucke dir doch !help <command> an")
+			await ctx.send(f"Fehlendes Argument für den Command {ctx.command}! gucke dir doch !help <command> an")
 		elif isinstance(error, commands.errors.CommandNotFound):
 			if ctx.message.content[1:].startswith("bump") or ctx.message.content[1:].isnumeric() or \
 					ctx.message.content[1:].startswith("d bump") or ctx.message.content[1:].startswith("disboard"):
 				return
-			await ctx.send("Diesen Befehl gibt es nicht :(")
+			await self.client.send(f"Diesen Befehl ({ctx.command}) gibt es nicht :(")
 		# Sonstige Errors
 		elif isinstance(error, discord.errors.Forbidden):
 			await ctx.send(f"403-Forbidden Mir sind Hände und Füße gebunden ich habe keine Rechte!")
@@ -38,12 +38,12 @@ class ErrorHandler(commands.Cog):
 				error,
 				(discord.InvalidArgument, commands.BadArgument, commands.BadUnionArgument,
 					commands.errors.UnexpectedQuoteError, commands.errors.ExpectedClosingQuoteError)):
-			await ctx.send(f'Dieses Argument ist nicht erlaubt für diese Methode.')
+			await ctx.send(f'Dieses Argument ist für {ctx.command} nicht erlaubt.')
+		elif isinstance(error, ValueError):
+			await ctx.send(f'Diese Value ist für {ctx.command} nicht gültig!')
 		# DiscordErrors
 		elif isinstance(error, commands.CommandError):
 			await ctx.send(f"Irgendwas funktioniert da nicht ganz...{error} {type(error)} <@!137291894953607168>")
-		elif isinstance(error, ValueError):
-			await ctx.send(f'Diese Value ist nicht gültig!')
 		# Sonstige Errors
 		else:
 			await ctx.send(f"Ein unerwarteter Fehler ist aufgetreten! \n{error} {type(error)} <@!137291894953607168>")
