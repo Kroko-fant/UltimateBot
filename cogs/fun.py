@@ -28,7 +28,7 @@ class Fun(commands.Cog):
 		metafrageembed.set_thumbnail(url="https://cdn.pixabay.com/photo/2015/10/31/12/00/question-1015308_960_720.jpg")
 		await ctx.send(embed=metafrageembed)
 	
-	@commands.command()
+	@commands.command(aliases=["flip"])
 	async def coinflip(self, ctx):
 		"""Werfe eine Münze und erhalte kopf oder Zahl."""
 		flip = random.randint(0, 1)
