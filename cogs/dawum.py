@@ -1,11 +1,10 @@
 import json
-import urllib
+import urllib.request as request
 import matplotlib.pyplot as plt
 import discord
 import numpy as np
 import asyncio
 from discord.ext import commands
-
 
 parlamentcodes = {
 	'bt': 0, 'bundestag': 0, 'bw': 1, 'bawü': 1, 'de-bw': 1, 'baden': 1, 'badenwürttemberg': 1, 'by': 2,
@@ -44,7 +43,7 @@ def run_plotting(data, title):
 
 
 def umfrage_ausgeben(parlacode, count):
-	data = json.loads(urllib.request.urlopen("https://api.dawum.de/").read())
+	data = json.loads(request.urlopen("https://api.dawum.de/").read())
 	if parlacode.isdigit():
 		parlacode = int(parlacode)
 		if not (-1 < parlacode):
@@ -67,7 +66,7 @@ def umfrage_ausgeben(parlacode, count):
 	
 	if count == 1:
 		output = f"von **{data['Institutes'][data['Surveys'][str(newids[0])]['Institute_ID']]['Name']}" \
-			f"** am {data['Surveys'][str(newids[0])]['Date']}\n"
+		         f"** am {data['Surveys'][str(newids[0])]['Date']}\n"
 	else:
 		output = f"Die aktuellsten {count} Umfragen.\n"
 	
@@ -84,16 +83,16 @@ def umfrage_ausgeben(parlacode, count):
 			score = round(score / count, 2)
 			party_scores[party] = score
 			output += f"\n** {party}**: {score} %"
-
+	
 	run_plotting(data=party_scores, title=data['Parliaments'][data['Surveys'][str(newids[0])]['Parliament_ID']]['Name'])
-
+	
 	wahlembed = discord.Embed(
 		title=data['Parliaments'][data['Surveys'][str(newids[0])]['Parliament_ID']]['Name'],
 		description=output, color=12370112)
 	wahlembed.set_footer(
 		text=f"UmfragenId: {newids[0]}\n Daten aus der Dawum APi: https://dawum.de/"
 		if count == 1 else "Daten aus der Dawum APi: https://dawum.de/")
-
+	
 	return wahlembed
 
 
@@ -112,7 +111,7 @@ class Dawum(commands.Cog):
 			if parla.lower() == "help":
 				wahlhelfembed = discord.Embed(
 					description="Verwendung: !poll oder !poll <ländercode> <range>. Länderkürzel der deutschen Bundesländer,"
-					" Bundestag oder EU Range beliebig wählbar (<= 10) und es wird ein gemittelter Durchschnitt berechnet",
+					            " Bundestag oder EU Range beliebig wählbar (<= 10) und es wird ein gemittelter Durchschnitt berechnet",
 					title="Hilfe zum Befehl !poll", color=12370112)
 				await ctx.send(embed=wahlhelfembed, delete_after=self.client.del_time_mid)
 			else:

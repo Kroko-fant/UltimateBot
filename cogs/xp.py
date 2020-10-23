@@ -106,6 +106,10 @@ class Xp(commands.Cog):
 		offset = 0
 		for index, row in enumerate(data, 1):
 			user = self.client.get_user(row[0])
+			if user is None:
+				db.execute("DELETE FROM leveldata WHERE userId LIKE ?", (row[0],))
+				offset += 1
+				continue
 			if index == 11 + offset:
 				break
 			if user.bot:
@@ -126,7 +130,7 @@ class Xp(commands.Cog):
 				else:
 					x = float(old[0][0]) + get_text_xp(len(ctx.content)) + bonusxp
 					oldlev = old[0][1]
-				
+
 				lev = oldlev
 				old_max_xp = self.levels[lev + 1]
 				while x > old_max_xp:
@@ -143,7 +147,6 @@ class Xp(commands.Cog):
 					else:
 						await ctx.channel.send(
 							f":partying_face: LEVEL UP! Du bist nun Level {lev} <@{ctx.author.id}> :tada:")
-		
 		# Ignore DMs
 		if ctx.guild is None or ctx.guild.id is None:
 			return
@@ -162,7 +165,6 @@ class Xp(commands.Cog):
 				else:
 					await add_xp(bonusxp=100, force_dm=True)
 					return
-		
 		try:
 			if t.time() - self.cooldowns[ctx.guild.id][ctx.author.id] < COOLDOWN_TIME:
 				return
@@ -177,7 +179,6 @@ class Xp(commands.Cog):
 		# Ignore Commands
 		if ctx.content.startswith(self.client.get_server_prefix(ctx.guild.id)):
 			return
-		
 		await add_xp()
 	
 	@commands.Cog.listener()

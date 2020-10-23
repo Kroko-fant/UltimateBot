@@ -3,7 +3,7 @@ import os
 import discord
 import customclient
 import time as t
-
+from discord import Intents
 from discord.ext import commands
 
 import SECRETS
@@ -24,7 +24,7 @@ handler = logging.FileHandler(
 	f'{t.struct_time(t.gmtime())[3]}_{t.struct_time(t.gmtime())[4]}]-discord.log', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
-client = customclient.CustomClient(DbMgr("db"), command_prefix=get_prefix)
+client = customclient.CustomClient(DbMgr("db"), command_prefix=get_prefix, intents=Intents.all())
 
 
 def load_modules():

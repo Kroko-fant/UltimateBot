@@ -49,7 +49,8 @@ class Autoverify(commands.Cog):
 		
 	@commands.Cog.listener()
 	async def on_message(self, message):
-		if message.guild is not None and message.author is not None and len(message.author.roles) == 1:
+		if message.guild is not None and message.author is not None and isinstance(message.author, discord.Member) \
+				and len(message.author.roles) == 1:
 			try:
 				member = message.guild.get_member(int(message.author.id))
 				# Main Rolle setzen

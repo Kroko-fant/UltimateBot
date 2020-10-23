@@ -46,7 +46,8 @@ class ErrorHandler(commands.Cog):
 			await ctx.send(f"Irgendwas funktioniert da nicht ganz...{error} {type(error)} <@!137291894953607168>")
 		# Sonstige Errors
 		else:
-			await ctx.send(f"Ein unerwarteter Fehler ist aufgetreten! \n{error} {type(error)} <@!137291894953607168>")
+			await ctx.send(
+				f"Ein unerwarteter Fehler ist aufgetreten! {ctx.command}\n{error} {type(error)} <@!137291894953607168>")
 
 
 def setup(client):
