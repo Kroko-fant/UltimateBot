@@ -20,11 +20,12 @@ def get_prefix(client, message):
 logger = logging.getLogger('discord')
 logger.setLevel(logging.DEBUG)
 handler = logging.FileHandler(
-	filename=f'[{t.struct_time(t.gmtime())[0]}-{t.struct_time(t.gmtime())[1]}-{t.struct_time(t.gmtime())[2]}]-['
+	filename=f'./logs/[{t.struct_time(t.gmtime())[0]}-{t.struct_time(t.gmtime())[1]}-{t.struct_time(t.gmtime())[2]}]-['
 	f'{t.struct_time(t.gmtime())[3]}_{t.struct_time(t.gmtime())[4]}]-discord.log', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
-client = customclient.CustomClient(DbMgr("db"), command_prefix=get_prefix, intents=Intents.all())
+client = customclient.CustomClient(
+	DbMgr("db"), command_prefix=get_prefix, intents=Intents.all(), case_insensitive=True)
 
 
 def load_modules():
