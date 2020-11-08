@@ -5,7 +5,6 @@ import customclient
 import time as t
 from discord import Intents
 from discord.ext import commands
-
 import SECRETS
 from dbmgr import DbMgr
 

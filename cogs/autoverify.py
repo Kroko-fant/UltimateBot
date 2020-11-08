@@ -29,8 +29,6 @@ class Autoverify(commands.Cog):
 	async def spacer(self, ctx, mode, role: discord.Role):
 		"""Füge eine Spacerrolle hinzu oder entferne diese"""
 		if role.guild.id != ctx.guild.id and (mode == "add" or mode == "remove"):
-			print(role.guild)
-			print(ctx.guild)
 			await ctx.send("Rolle wurde auf dem Server nicht gefunden.", delete_after=self.client.del_time_mid)
 		elif mode == "add":
 			if str(ctx.guild.id) not in self.spacers.keys():
