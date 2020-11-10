@@ -22,6 +22,9 @@ class Moderation(commands.Cog):
 		if ctx.author.top_role <= member.top_role:
 			await ctx.send("Du kannst keine Leute kicken die einen gleich hohen/höheren Rang haben")
 			return
+		if ctx.guild.me <= member.top_role:
+			await ctx.send("Ich kann keine Leute kicken die einen gleich hohen/höheren Rang haben")
+			return
 		await member.kick(reason=reason)
 		await ctx.send(f"User **{member}** wurde gekickt.", delete_after=self.client.del_time_mid)
 
@@ -31,6 +34,9 @@ class Moderation(commands.Cog):
 		"""Ban den User vom Server Syntax: {prefix}ban <@user>"""
 		if ctx.author.top_role <= member.top_role:
 			await ctx.send("Du kannst keine Leute bannen die einen gleich hohen/höheren Rang haben")
+			return
+		if ctx.guild.me <= member.top_role:
+			await ctx.send("Ich kann keine Leute bannen die einen gleich hohen/höheren Rang haben")
 			return
 		await member.ban(reason=reason)
 		await ctx.send(f"User **{member}** wurde gebannt.", delete_after=self.client.del_time_mid)
