@@ -51,7 +51,7 @@ class Fun(commands.Cog):
 	
 	@commands.command()
 	async def card(self, ctx):
-		"""Ziehe eine Karte"""
+		"""Lasse einen Pinguin eine Karte ziehen"""
 		karten = [
 			":diamonds: 7", ":diamonds: 8", ":diamonds: 9", ":diamonds: 10", ":diamonds: Bube", ":diamonds: Dame",
 			":diamonds: Koenig", ":diamonds: Ass", ":hearts: 7", ":hearts: 8", ":hearts: 9", ":hearts: 10",
@@ -60,20 +60,20 @@ class Fun(commands.Cog):
 			":clubs: 7", ":clubs: 8", ":clubs: 9", ":clubs: 10", ":clubs: Bube", ":clubs: Dame", ":clubs: Koenig",
 			":clubs: Ass"]
 		await ctx.send(f"Du hast folgende Karte gezogen: **{karten[random.randint(0, 31)]}**")
-	
+
 	@commands.command()
 	async def userinfo(self, ctx, member: discord.Member = None):
-		"""Zeigt Informationen über einen User an."""
+		"""Zeigt Informationen über einen Pinguin an."""
 		if member is None:
 			member = ctx.author
 		roles = [role for role in member.roles]
-		
+
 		userinfoembed = discord.Embed(colour=member.color, timestamp=ctx.message.created_at)
-		
-		userinfoembed.set_author(name=f'Informationen über: {member}')
+
+		userinfoembed.set_author(name=f'🐧 Informationen über: {member}')
 		userinfoembed.set_thumbnail(url=member.avatar_url)
-		userinfoembed.set_footer(text=f'{ctx.author} abgefragt von', icon_url=ctx.author.avatar_url)
-		
+		userinfoembed.set_footer(text=f'{member} abgefragt von {ctx.author}', icon_url=ctx.author.avatar_url)
+
 		userinfoembed.add_field(name='ID:', value=str(member.id))
 		userinfoembed.add_field(name='Name:', value=str(member.display_name))
 		userinfoembed.add_field(name='Status:', value=str(member.status))
