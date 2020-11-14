@@ -1,5 +1,9 @@
-import discord
+import asyncio
+import os
+import sys
+
 from discord.ext.commands import Bot
+from custom.reaction_decoder import ReactionDecoder
 
 
 class CustomClient(Bot):
@@ -11,6 +15,7 @@ class CustomClient(Bot):
 		self.del_time_mid = 30
 		self.del_time_long = 60
 		self.prefixes = dict()
+		self.rdecoder = ReactionDecoder()
 	
 	def get_server_prefix(self, guildid):
 		return self.prefixes[guildid] if guildid in self.prefixes else "!"
@@ -79,5 +84,15 @@ class CustomClient(Bot):
 
 	# OVERRIDE
 	async def close(self):
+		for f in os.listdir("db"):
+			if f.endswith(".db"):
+				channel = self.dbconf_get(int(f[0:-3]), "botlog")
+				if channel is None:
+					continue
+				channel = self.get_channel(int(channel))
+				if channel is None:
+					continue
+				await channel.send(f"Bot wird für {self.reason} heruntergefahren")
+		#self.loop._check_closed = lambda: True
 		await super().close()
 		self.db.close_all()
