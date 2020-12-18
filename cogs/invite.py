@@ -35,7 +35,8 @@ class Invite(commands.Cog):
 			if invite not in new:
 				inviter = invite.inviter
 				await channel.send(
-					f"**{member}** ({member.id}) wurde von **{inviter}** ({inviter.id}) eingeladen. (Onetime)")
+					f"**{member}** ({member.id}) wurde von"
+					f" **{inviter}** ({inviter.id}) eingeladen. (Onetime)")
 				break
 			else:
 				if invite.uses != new[index].uses:
