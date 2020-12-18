@@ -6,6 +6,8 @@ import numpy as np
 import asyncio
 from discord.ext import commands
 
+# Notice! You are not allowed to use this module without giving the credits to https://dawum.de/api/
+
 parlamentcodes = {
     'bt': 0, 'bundestag': 0, 'bw': 1, 'bawü': 1, 'de-bw': 1, 'baden': 1, 'badenwürttemberg': 1, 'by': 2,
     'bay': 2, 'de-by': 2, 'bayern': 2, 'be': 3, 'de-be': 3, 'berlin': 3, 'ber': 3, 'bb': 4, 'de-bb': 4,
@@ -27,8 +29,8 @@ colors = {
     'Sonstige': '#A9A9A9'}
 
 
+# creates a plot! and saves it in data/output.png That has to be synchronized
 def run_plotting(data, title):
-    print(data)
     plt.rcdefaults()
     objects = tuple(data.keys())
     y_pos = np.arange(len(objects))
@@ -43,6 +45,7 @@ def run_plotting(data, title):
     plt.clf()
 
 
+# Creates an embed with an poll
 def umfrage_ausgeben(parlacode, count):
     data = json.loads(request.urlopen("https://api.dawum.de/").read())
     if parlacode.isdigit():
@@ -66,9 +69,8 @@ def umfrage_ausgeben(parlacode, count):
         umfragenid.remove(max(umfragenid))
 
     if count == 1:
-        output = \
-            f"von **{data['Institutes'][data['Surveys'][str(newids[0])]['Institute_ID']]['Name']}** am " \
-            f"{data['Surveys'][str(newids[0])]['Date']}\n"
+        output = f"von **{data['Institutes'][data['Surveys'][str(newids[0])]['Institute_ID']]['Name']}** " \
+                 f"am {data['Surveys'][str(newids[0])]['Date']}\n"
     else:
         output = f"Die aktuellsten {count} Umfragen.\n"
 
@@ -77,6 +79,7 @@ def umfrage_ausgeben(parlacode, count):
     for party in partycodes.keys():
         score = 0.0
         for elements in newids:
+            # Ignores Errors. Providing a chart has priority
             try:
                 score += int(data['Surveys'][str(elements)]['Results'][str(partycodes[party])])
             except KeyError:
@@ -92,8 +95,9 @@ def umfrage_ausgeben(parlacode, count):
         title=data['Parliaments'][data['Surveys'][str(newids[0])]['Parliament_ID']]['Name'],
         description=output, color=12370112)
     wahlembed.set_footer(
-        text=f"UmfragenId: {newids[0]}\n Daten aus der Dawum APi: https://dawum.de/"
-        if count == 1 else "Daten aus der Dawum APi: https://dawum.de/")
+        text=
+        (f"UmfragenId: {newids[0]}\n Daten aus der Dawum APi: https://dawum.de/"
+         if count == 1 else "Daten aus der Dawum APi: https://dawum.de/") + " | Modul by Krokofant#0001")
 
     return wahlembed
 
@@ -109,6 +113,7 @@ class Dawum(commands.Cog):
         """Gebe die aktuelle Wahlumfrage aus.
         Syntax: !poll <ländercode> <Umfragenzahl>
         Der Ländercode ist optional. Alle Ländercodes sind intuitiv. Umfragenzahl"""
+        # The lock ensures that no plotting will be overwritten.
         async with self.lock:
             if parla.lower() == "help":
                 wahlhelfembed = discord.Embed(

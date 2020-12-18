@@ -1,4 +1,3 @@
-import asgiref.sync as asg
 import logging
 import os
 import time as t
@@ -7,7 +6,6 @@ import discord
 from discord import Intents
 from discord.ext import commands
 
-import SECRETS
 import customclient
 from dbmgr import DbMgr
 
@@ -154,4 +152,4 @@ async def on_command_error(ctx, error, force=False):
 
 print("Botstart abgeschlossen!")
 load_modules()
-client.run(SECRETS.TOKEN)
+client.run(os.environ.get("DISCORD_TOKEN"))

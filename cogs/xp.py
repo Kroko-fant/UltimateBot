@@ -58,14 +58,17 @@ class Xp(commands.Cog):
 	@commands.command(aliases=["rank", "level"])
 	async def xp(self, ctx, user: discord.Member = None):
 		"""Zeigt die XP eines Users an."""
+		if user.bot:
+			await ctx.send(":robot: Bots haben keine XP!")
+			return
 		if user is None:
 			user = ctx.author
-		
+
 		def parseXP(dis_id):
 			with self.client.db.get(ctx.guild.id) as db:
 				row = db.execute("SELECT xp, level FROM leveldata WHERE userId = ?", (dis_id,)).fetchall()
 				return dis_id, row[0][1], row[0][0], self.levels[row[0][1] + 1]
-		
+
 		try:
 			disid, lev, xpx, xptick = parseXP(user.id)
 		except BaseException:
@@ -121,6 +124,9 @@ class Xp(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_message(self, ctx):
+		if ctx.author is None or ctx.author.bot:
+			return
+
 		async def add_xp(bonusxp=0, force_dm=False):
 			with self.client.db.get(ctx.guild.id) as db:
 				old = db.execute("SELECT xp, level FROM leveldata WHERE userId = ?", (ctx.author.id,)).fetchall()
@@ -190,17 +196,20 @@ class Xp(commands.Cog):
 	async def on_member_leave(self, member):
 		with self.client.db.get(member.guild.id) as db:
 			db.execute("DELETE FROM leveldata WHERE userId LIKE ?", (member.id,))
-	
+
 	@commands.Cog.listener()
 	async def on_voice_state_update(self, member, before, after):
+		if member is None or member.bot:
+			return
+
 		if member.guild.id not in voice_states.keys():
 			voice_states[member.guild.id] = dict()
-		
+
 		def put_user_in(in_member=member):
 			if in_member.id in voice_states[in_member.guild.id]:
 				return
 			voice_states[in_member.guild.id][in_member.id] = t.time()
-		
+
 		async def del_user(del_member=member):
 			try:
 				voice_time = t.time() - voice_states[del_member.guild.id][del_member.id]
