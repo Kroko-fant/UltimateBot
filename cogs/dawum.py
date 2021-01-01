@@ -46,59 +46,62 @@ def run_plotting(data, title):
 
 
 # Creates an embed with an poll
-def umfrage_ausgeben(parlacode, count):
+def umfrage_ausgeben(parlacode, count: int):
     data = json.loads(request.urlopen("https://api.dawum.de/").read())
-    if parlacode.isdigit():
-        parlacode = int(parlacode)
-        if not (-1 < parlacode):
-            return None
-
-        umfragenid = [parlacode] if int(parlacode) > 18 \
-            else [int(k) for k, v in data['Surveys'].items() if v['Parliament_ID'] == str(parlacode)]
-    else:
+    # Check own shortcuts
+    if not parlacode.isdigit():
         if parlacode not in parlamentcodes:
             return None
         parlacode = str(parlamentcodes[parlacode])
-        umfragenid = [int(k) for k, v in data['Surveys'].items() if v['Parliament_ID'] == str(parlacode.lower())]
+        umfragen_ids = [int(k) for k, v in data['Surveys'].items() if v['Parliament_ID'] == str(parlacode.lower())]
+    # If its not a valid parlament maybe it is a survey ID.
+    elif not (parlacode in data['Parliaments']):
+        # If its a valid ID umfragen_ids is the one.
+        if parlacode in data['Surveys']:
+            umfragen_ids = [parlacode]
+        else:
+            return None
+    else:
+        umfragen_ids = [int(k) for k, v in data['Surveys'].items() if v['Parliament_ID'] == parlacode]
 
-    if len(umfragenid) < count:
-        count = len(umfragenid)
-    newids = []
-    for ids in range(count):
-        newids.append(max(umfragenid))
-        umfragenid.remove(max(umfragenid))
+    parlament_name = data['Parliaments'][data['Surveys'][str(umfragen_ids[0])]['Parliament_ID']]['Name']
 
+    # Count must be the minimum of the list of all available IDs and tha requested count
+    count = min(len(umfragen_ids), count)
+    for _ in range(len(umfragen_ids) - count):
+        umfragen_ids.remove(min(umfragen_ids))
+
+    # Determinate which subtitle to choose
     if count == 1:
-        output = f"von **{data['Institutes'][data['Surveys'][str(newids[0])]['Institute_ID']]['Name']}** " \
-                 f"am {data['Surveys'][str(newids[0])]['Date']}\n"
+        output = f"von **{data['Institutes'][data['Surveys'][str(umfragen_ids[0])]['Institute_ID']]['Name']}** " \
+                 f"am {data['Surveys'][str(umfragen_ids[0])]['Date']}\n"
     else:
         output = f"Die aktuellsten {count} Umfragen.\n"
 
     party_scores = dict()
 
+    # Count results for partys
     for party in partycodes.keys():
         score = 0.0
-        for elements in newids:
+        for element in umfragen_ids:
             # Ignores Errors. Providing a chart has priority
             try:
-                score += int(data['Surveys'][str(elements)]['Results'][str(partycodes[party])])
+                score += int(data['Surveys'][str(element)]['Results'][str(partycodes[party])])
             except KeyError:
-                pass
+                continue
         if score > 0:
             score = round(score / count, 2)
             party_scores[party] = score
             output += f"\n** {party}**: {score} %"
 
-    run_plotting(data=party_scores, title=data['Parliaments'][data['Surveys'][str(newids[0])]['Parliament_ID']]['Name'])
+    # Runs the plotting and gives an output.png
+    run_plotting(data=party_scores, title=parlament_name)
 
-    wahlembed = discord.Embed(
-        title=data['Parliaments'][data['Surveys'][str(newids[0])]['Parliament_ID']]['Name'],
-        description=output, color=12370112)
-    wahlembed.set_footer(
-        text=
-        (f"UmfragenId: {newids[0]}\n Daten aus der Dawum APi: https://dawum.de/"
-         if count == 1 else "Daten aus der Dawum APi: https://dawum.de/") + " | Modul by Krokofant#0001")
-
+    # creates the embed
+    wahlembed = discord.Embed(title=parlament_name, description=output, color=12370112)
+    wahlembed.set_footer(text=
+                         (f"umfragen_ids: {umfragen_ids[0]}\n" if count == 1 else "")
+                         + "Daten aus der Dawum APi: https://dawum.de/ | Modul by Krokofant#0001")
     return wahlembed
 
 
