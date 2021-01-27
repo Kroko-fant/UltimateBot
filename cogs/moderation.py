@@ -35,7 +35,7 @@ class Moderation(commands.Cog):
 		if ctx.author.top_role <= member.top_role:
 			await ctx.send("Du kannst keine Leute bannen die einen gleich hohen/höheren Rang haben")
 			return
-		if ctx.guild.me <= member.top_role:
+		if ctx.guild.me.top_role <= member.top_role:
 			await ctx.send("Ich kann keine Leute bannen die einen gleich hohen/höheren Rang haben")
 			return
 		await member.ban(reason=reason)
