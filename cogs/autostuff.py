@@ -21,7 +21,7 @@ class Autostuff(commands.Cog):
 				if channel is None:
 					return
 			except Exception:
-				return
+				continue
 			await channel.send("dlm!bump")
 
 	@bump.before_loop
