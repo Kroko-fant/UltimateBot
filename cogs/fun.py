@@ -15,8 +15,8 @@ class Fun(commands.Cog):
 		metafrageembed = discord.Embed(
 			title="Metafrage",
 			description='Du hast gerade eine Metafrage gestellt. Eine Metafrage ist eine unnötige Frage über der '
-			'HauptFrage. Dies ist zwar höflich, aber ziemlich umständlich, da man seine Frage dann zwei mal stellen '
-			'muss. \n\nDie Frage "Kennt sich jemand mit x aus?" hilft leider auch nicht weiter. Die Anwesenden könnten'
+						'HauptFrage. Dies ist zwar höflich, aber ziemlich umständlich, da man seine Frage dann zwei mal stellen '
+						'muss. \n\nDie Frage "Kennt sich jemand mit x aus?" hilft leider auch nicht weiter. Die Anwesenden könnten'
 						' eventuell bei dem Problem helfen, obwohl sie nicht von sich behaupten würden, mit dem Thema vertraut zu '
 						'sein. Und auch wenn jemand mit dem erfragten Thema vertraut ist, bedeutet dies nicht, dass er/sie eine'
 						' spezielle Frage zu diesem Thema beantworten kann – niemand ist allwissend.\n\nDeswegen, stelle bitte '
