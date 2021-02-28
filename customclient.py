@@ -1,7 +1,6 @@
 import os
 
 from discord.ext.commands import Bot
-from custom.reaction_decoder import ReactionDecoder
 
 
 class CustomClient(Bot):
@@ -13,7 +12,6 @@ class CustomClient(Bot):
         self.del_time_mid = 30
         self.del_time_long = 60
         self.prefixes = dict()
-        self.rdecoder = ReactionDecoder()
 
     def get_server_prefix(self, guildid):
         return self.prefixes[guildid] if guildid in self.prefixes else "!"

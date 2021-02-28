@@ -127,7 +127,7 @@ class ServerCosmetic(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         if str(message.guild.id) in self.reactionchannelemotes and message.guild.id in self.reactionchannels and \
-                str(message.channel.id) in self.reactionchannels[message.guild.id]:
+                str(message.channel.id) == self.reactionchannels[message.guild.id]:
             for x in self.reactionchannelemotes[str(message.guild.id)]:
                 if x.encode("unicode_escape").startswith(b"\U"):
                     await message.add_reaction(emoji=x)
