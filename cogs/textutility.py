@@ -137,7 +137,7 @@ class TextUtility(commands.Cog):
 					if category is None:
 						raise KeyError
 					new = await category.create_text_channel(
-						message.content, position=0, topic=message.content,
+						message.content, topic=message.content,
 						reason=f"Neuer Channel von User {str(message.author)} zum Thema {message.content}")
 					await message.channel.send(
 						f"Channel {message.content} erfolgreich erstellt.", delete_after=self.client.del_time_small)
