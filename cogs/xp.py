@@ -58,11 +58,11 @@ class Xp(commands.Cog):
 	@commands.command(aliases=["rank", "level"])
 	async def xp(self, ctx, user: discord.Member = None):
 		"""Zeigt die XP eines Users an."""
+		if user is None:
+			user = ctx.author
 		if user.bot:
 			await ctx.send(":robot: Bots haben keine XP!")
 			return
-		if user is None:
-			user = ctx.author
 
 		def parseXP(dis_id):
 			with self.client.db.get(ctx.guild.id) as db:

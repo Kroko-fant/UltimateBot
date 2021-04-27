@@ -23,7 +23,7 @@ class Moderation(commands.Cog):
 		await ctx.channel.purge(limit=int(amount))
 		await ctx.send(f"Es wurden **{amount}** Nachrichten gelöscht.", delete_after=self.client.del_time_mid)
 
-	async def add_warn(self, guild, member, reason):
+	async def add_warn(self, guild, member: discord.Member, reason):
 		banned = False
 		# Fetch max warns
 		with self.client.db.get(guild.id) as db:
@@ -59,7 +59,7 @@ class Moderation(commands.Cog):
 		)
 
 	@commands.command()
-	@commands.has_permissions(kick_members=True)
+	@commands.has_permissions(ban_members=True)
 	async def warn(self, ctx, member: discord.Member, *, reason="Kein Grund angegeben"):
 		"""Warnt einen Nutzer. Es kann festgelegt werden wann Warns verfallen."""
 		if ctx.author.top_role <= member.top_role:
