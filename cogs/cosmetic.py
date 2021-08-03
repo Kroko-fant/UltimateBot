@@ -9,7 +9,7 @@ class Cosmetic(commands.Cog):
 
 	def __init__(self, client):
 		self.client = client
-		self.version = "1.5.0"
+		self.version = "2.0.0"
 
 	@commands.Cog.listener()
 	async def on_command(self, ctx):
