@@ -30,6 +30,8 @@ class IsEven(commands.Cog):
             )
 
             emb.add_field(name="Advertisement", value=json_response["ad"])
+            emb.set_footer(text="Build using isEven API https://isevenapi.xyz/")
+
             await ctx.send(embed=emb)
 
 
