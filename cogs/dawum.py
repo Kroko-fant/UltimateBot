@@ -165,10 +165,6 @@ class Dawum(commands.Cog):
                 return
             await ctx.send("Wähle ein Bundesland aus!", view=Dawum.DropdownUI(count))
 
-    @commands.command()
-    async def newpoll(self, ctx):
-        await ctx.send("Wähle ein Bundesland aus!", view=Dawum.DropdownUI())
-
 
 def setup(client):
     client.add_cog(Dawum(client))
