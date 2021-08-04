@@ -38,14 +38,14 @@ class ReactionRoles(commands.Cog):
 
     @commands.group(aliases=["rr"], invoke_without_command=True)
     @commands.has_permissions(manage_roles=True)
-    async def reactionroles(self, ctx):
+    async def reactionroles(self, ctx: commands.Context):
         """Managed Reactionroles"""
         await ctx.send_help(ctx.command)
         return
 
     @reactionroles.command(aliases=["append"])
     @commands.has_permissions(manage_roles=True)
-    async def add(self, ctx, role: discord.Role):
+    async def add(self, ctx: commands.Context, role: discord.Role):
         """Erstellt eine Reactionrole"""
 
         if ctx.author.top_role <= role and ctx.author != ctx.guild.owner:
@@ -80,7 +80,7 @@ class ReactionRoles(commands.Cog):
 
     @reactionroles.command(aliases=["remove"])
     @commands.has_permissions(manage_roles=True)
-    async def delete(self, ctx):
+    async def delete(self, ctx:commands.Context):
         """Löscht eine Reacrtionrole"""
 
         info_message = await ctx.send("Reaiere mit einem Emoji auf eine Nachricht um ein Emoji zu entfernen!")
@@ -101,7 +101,7 @@ class ReactionRoles(commands.Cog):
 
     @commands.Cog.listener(name="on_raw_reaction_add")
     @decode_reaction
-    async def on_reaction_add(self, reaction, member):
+    async def on_reaction_add(self, reaction: discord.Reaction, member):
         if reaction.me:
             return
 
@@ -128,7 +128,7 @@ class ReactionRoles(commands.Cog):
 
     @add.error
     @delete.error
-    async def handle_error(self, ctx, error):
+    async def handle_error(self, ctx: commands.Context, error: commands.CommandError):
         original = getattr(error, 'original', error)
 
         if isinstance(original, asyncio.TimeoutError):

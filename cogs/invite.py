@@ -1,4 +1,5 @@
 import asyncio
+import discord
 from discord.ext import commands
 
 
@@ -17,11 +18,11 @@ class Invite(commands.Cog):
 		self.invites[guild.id] = await guild.invites()
 	
 	@commands.Cog.listener()
-	async def on_guild_join(self, guild):
+	async def on_guild_join(self, guild: discord.Guild):
 		await self.update_invites(guild)
 	
 	@commands.Cog.listener()
-	async def on_member_join(self, member):
+	async def on_member_join(self, member: discord.Member):
 		guild = member.guild
 		channelid = self.get_invitelog(guild.id)
 		if channelid is None:
@@ -51,11 +52,11 @@ class Invite(commands.Cog):
 		await self.update_invites(guild)
 	
 	@commands.Cog.listener()
-	async def on_invite_create(self, invite):
+	async def on_invite_create(self, invite: discord.Invite):
 		await self.update_invites(invite.guild)
 	
 	@commands.Cog.listener()
-	async def on_invite_delete(self, invite):
+	async def on_invite_delete(self, invite: discord.Invite):
 		await self.update_invites(invite.guild)
 
 

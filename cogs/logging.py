@@ -1,3 +1,4 @@
+import discord
 from discord.ext import commands
 
 
@@ -21,22 +22,22 @@ class Logging(commands.Cog):
 	
 	# Memberleave
 	@commands.Cog.listener()
-	async def on_member_join(self, member):
+	async def on_member_join(self, member: discord.Member):
 		await self.log_stuff(member, f":inbox_tray: **{member}** ({member.id}) hat den Server betreten.")
 		
 	# Memberleave
 	@commands.Cog.listener()
-	async def on_member_remove(self, member):
+	async def on_member_remove(self, member: discord.Member):
 		await self.log_stuff(member, f":outbox_tray: **{member}** ({member.id}) hat den Server verlassen.")
 	
 	# Member wird gebannt
 	@commands.Cog.listener()
-	async def on_member_ban(self, _, member):
+	async def on_member_ban(self, _, member: discord.Member):
 		await self.log_stuff(member, f":no_entry_sign: **{member}** ({member.id}) wurde gebannt.")
 	
 	# Member wird entbannt
 	@commands.Cog.listener()
-	async def on_member_unban(self, _, member):
+	async def on_member_unban(self, _, member: discord.Member):
 		await self.log_stuff(member, f":white_check_mark: **{member}** ({member.id}) wurde entgebannt.")
 	
 	# Nachricht löschen
@@ -62,7 +63,7 @@ class Logging(commands.Cog):
 
 	# Voice-Änderungen
 	@commands.Cog.listener()
-	async def on_voice_state_update(self, member, before, after):
+	async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
 		if member is None or member.guild is None:
 			return
 		logch = self.get_logchannel(member.guild.id)

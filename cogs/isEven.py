@@ -10,10 +10,7 @@ class IsEven(commands.Cog):
         self.client = client
 
     @commands.command()
-    async def isEven(self, ctx, number):
-        if not number.isnumeric():
-            await ctx.send("Error! This is not a number!")
-        number = int(number)
+    async def isEven(self, ctx: commands.Context, number: int):
         response = u.urlopen(f"https://api.isevenapi.xyz/api/iseven/{number}")
         json_response = json.loads(response.read())
         if "error" in json_response:

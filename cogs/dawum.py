@@ -153,7 +153,7 @@ class Dawum(commands.Cog):
         self.lock = asyncio.Lock()
 
     @commands.command(aliases=["umfrage"])
-    async def poll(self, ctx, count=1):
+    async def poll(self, ctx: commands.Context, count=1):
         """Gebe die aktuelle Wahlumfrage aus.
         Syntax: !poll<Umfragenzahl>
         Wähle anschließend ein Parlament aus!"""

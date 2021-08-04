@@ -10,7 +10,7 @@ class Fun(commands.Cog):
 		self.client = client
 	
 	@commands.command()
-	async def metafrage(self, ctx):
+	async def metafrage(self, ctx: commands.Context):
 		"""Gibt den Meta-Fragen-Text wider"""
 		metafrageembed = discord.Embed(
 			title="Metafrage",
@@ -29,7 +29,7 @@ class Fun(commands.Cog):
 		await ctx.send(embed=metafrageembed)
 
 	@commands.command()
-	async def jobbörse(self, ctx, member: discord.Member = None):
+	async def jobbörse(self, ctx: commands.Context, member: discord.Member = None):
 		await ctx.send(embed=discord.Embed(
 			title="Wir sind keine Jobbörse!", description=
 			f"Hey {member.mention if member is not None else ''} suchst du jemanden der bei dir arbeitet? Vielleicht"
@@ -44,7 +44,7 @@ class Fun(commands.Cog):
 			f"https://de.wikipedia.org/wiki/Jobb%C3%B6rse"))
 
 	@commands.command(aliases=["flip"])
-	async def coinflip(self, ctx):
+	async def coinflip(self, ctx: commands.Context):
 		"""Werfe eine Münze und erhalte kopf oder Zahl."""
 		flip = random.randint(0, 1)
 		if flip == 1:
@@ -55,17 +55,17 @@ class Fun(commands.Cog):
 			await ctx.send("Irgendwie hat das nicht ganz geklappt...", delete_after=self.client.del_time_mid)
 	
 	@commands.command()
-	async def randomnumber(self, ctx, int2=100):
+	async def randomnumber(self, ctx: commands.Context, upper_bound=100):
 		"""Gebe eine zufällige Zahl zwischen 0 und x ein.
 		Syntax: {prefix}randomnumber <x>
 		Hat x keinen Wert bekommt x automatisch 100 zugewiesen."""
-		if int2 <= 0:
+		if upper_bound <= 0:
 			await ctx.send("Deine Zahl sollte größer als 0 sein!")
 		else:
-			await self.client.send(ctx, f"Deine Nummer zwischen 0 und {int2} lautet: **{random.randint(0, int2)}**")
+			await ctx.send(f"Deine Nummer zwischen 0 und {upper_bound} lautet: **{random.randint(0, upper_bound)}**")
 	
 	@commands.command()
-	async def card(self, ctx):
+	async def card(self, ctx: commands.Context):
 		"""Lasse einen Pinguin eine Karte ziehen"""
 		karten = [
 			":diamonds: 7", ":diamonds: 8", ":diamonds: 9", ":diamonds: 10", ":diamonds: Bube", ":diamonds: Dame",
@@ -77,7 +77,7 @@ class Fun(commands.Cog):
 		await ctx.send(f"Du hast folgende Karte gezogen: **{karten[random.randint(0, 31)]}**")
 
 	@commands.command()
-	async def userinfo(self, ctx, member: discord.Member = None):
+	async def userinfo(self, ctx:commands.Context, member: discord.Member = None):
 		"""Zeigt Informationen über einen Pinguin an."""
 		if member is None:
 			member = ctx.author
