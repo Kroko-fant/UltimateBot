@@ -86,8 +86,8 @@ class Fun(commands.Cog):
 		userinfoembed = discord.Embed(colour=member.color, timestamp=ctx.message.created_at)
 
 		userinfoembed.set_author(name=f'🐧 Informationen über: {member}')
-		userinfoembed.set_thumbnail(url=member.avatar_url)
-		userinfoembed.set_footer(text=f'{member} abgefragt von {ctx.author}', icon_url=ctx.author.avatar_url)
+		userinfoembed.set_thumbnail(url=member.avatar.url)
+		userinfoembed.set_footer(text=f'{member} abgefragt von {ctx.author}', icon_url=ctx.author.avatar.url)
 
 		userinfoembed.add_field(name='ID:', value=str(member.id))
 		userinfoembed.add_field(name='Name:', value=str(member.display_name))
