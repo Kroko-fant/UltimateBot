@@ -50,5 +50,5 @@ class ErrorHandler(commands.Cog):
 				f"Ein unerwarteter Fehler ist aufgetreten! {ctx.command}\n{error} {type(error)} <@!137291894953607168>")
 
 
-def setup(client):
-	client.add_cog(ErrorHandler(client))
+async def setup(client):
+	await client.add_cog(ErrorHandler(client))

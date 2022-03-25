@@ -50,14 +50,14 @@ class TextUtility(commands.Cog):
 						del_channel, time = ch, msg.created_at
 				await del_channel.delete()
 		
-		for guildid in self.archives.keys():
+		for guild_id in self.archives.keys():
 			try:
-				guild, archivcategory, category = initalise(guildid)
+				guild, archiv_category, category = initalise(guild_id)
 			except Exception:
 				continue
 			
 			for channel in category.text_channels:
-				if guildid in self.topiccreate and channel.id == self.topiccreate[guildid]:
+				if guild_id in self.topiccreate and channel.id == self.topiccreate[guild_id]:
 					continue
 				try:
 					message = await channel.history(limit=1).next()
@@ -65,8 +65,8 @@ class TextUtility(commands.Cog):
 					await channel.delete()
 				else:
 					if round((now - message.created_at).total_seconds()) > ARCHIV_TIME:
-						await clean_archive(archive=archivcategory)
-						await channel.edit(reason="Archivieren", category=archivcategory)
+						await clean_archive(archive=archiv_category)
+						await channel.edit(reason="Archivieren", category=archiv_category)
 	
 	@commands.Cog.listener()
 	async def on_ready(self):
@@ -161,5 +161,5 @@ class TextUtility(commands.Cog):
 						delete_after=self.client.del_time_mid)
 
 
-def setup(client):
-	client.add_cog(TextUtility(client))
+async def setup(client):
+	await client.add_cog(TextUtility(client))

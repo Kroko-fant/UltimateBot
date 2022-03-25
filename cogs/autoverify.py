@@ -56,11 +56,10 @@ class Autoverify(commands.Cog):
 				await member.add_roles(role, reason="verify (mainrole)")
 				# Spacer setzen
 				for rid in self.spacers[str(message.guild.id)]:
-					trole = message.guild.get_role(rid)
-					await member.add_roles(trole, reason="verify (spacer)")
+					await member.add_roles(message.guild.get_role(rid), reason="verify (spacer)")
 			except KeyError:
 				pass
 
 
-def setup(client):
-	client.add_cog(Autoverify(client))
+async def setup(client):
+	await client.add_cog(Autoverify(client))

@@ -23,24 +23,20 @@ class Invite(commands.Cog):
 	@commands.Cog.listener()
 	async def on_member_join(self, member):
 		guild = member.guild
-		channelid = self.get_invitelog(guild.id)
-		if channelid is None:
+		if (channel_id := self.get_invitelog(guild.id)) is None:
 			return
-		channel = self.client.get_channel(int(channelid))
-		if channel is None:
+		if (channel := self.client.get_channel(int(channel_id))) is None:
 			return
 		new = await guild.invites()
-		old = self.invites[guild.id]
-		for index, invite in enumerate(old):
+		for index, invite in enumerate(self.invites[guild.id]):
+			inviter = invite.inviter
 			if invite not in new:
-				inviter = invite.inviter
 				await channel.send(
 					f"**{member}** ({member.id}) wurde von"
 					f" **{inviter}** ({inviter.id}) eingeladen. (Onetime)")
 				break
 			else:
 				if invite.uses != new[index].uses:
-					inviter = invite.inviter
 					await channel.send(
 						f"**{member}** ({member.id}) wurde von **{inviter}** ({inviter.id}) eingeladen. "
 						f"(Invite: {invite.code})")
@@ -59,5 +55,5 @@ class Invite(commands.Cog):
 		await self.update_invites(invite.guild)
 
 
-def setup(client):
-	client.add_cog(Invite(client))
+async def setup(client):
+	await client.add_cog(Invite(client))

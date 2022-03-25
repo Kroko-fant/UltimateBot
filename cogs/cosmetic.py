@@ -35,5 +35,5 @@ class Cosmetic(commands.Cog):
 		await ctx.send(embed=embed, delete_after=self.client.del_time_mid)
 
 
-def setup(client):
-	client.add_cog(Cosmetic(client))
+async def setup(client):
+	await client.add_cog(Cosmetic(client))

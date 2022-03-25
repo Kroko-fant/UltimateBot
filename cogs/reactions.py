@@ -96,8 +96,7 @@ class ReactionRoles(commands.Cog):
             return
 
         for entry in result:
-            role = discord.utils.get(guild.roles, id=int(entry[0]))
-            if role in member.roles:
+            if (role:= discord.utils.get(guild.roles, id=int(entry[0]))) in member.roles:
                 await member.remove_roles(role)
             else:
                 await member.add_roles(role)
@@ -122,5 +121,5 @@ class ReactionRoles(commands.Cog):
             await errhandler.on_command_error(ctx, error, force=True)
 
 
-def setup(client):
-    client.add_cog(ReactionRoles(client))
+async def setup(client):
+    await client.add_cog(ReactionRoles(client))

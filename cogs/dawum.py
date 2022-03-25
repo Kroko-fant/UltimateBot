@@ -49,8 +49,7 @@ def run_plotting(data, title):
 def umfrage_ausgeben(parlacode, count):
     data = json.loads(request.urlopen("https://api.dawum.de/").read())
     if parlacode.isdigit():
-        parlacode = int(parlacode)
-        if not (-1 < parlacode):
+        if (parlacode:= int(parlacode)) < 0:
             return None
 
         umfragenid = [parlacode] if int(parlacode) > 18 \
@@ -98,7 +97,6 @@ def umfrage_ausgeben(parlacode, count):
         text=
         (f"UmfragenId: {newids[0]}\n Daten aus der Dawum APi: https://dawum.de/"
          if count == 1 else "Daten aus der Dawum APi: https://dawum.de/") + " | Modul by Krokofant#0001")
-
     return wahlembed
 
 
@@ -137,5 +135,5 @@ class Dawum(commands.Cog):
                     await ctx.send(file=discord.File("data/output.png"))
 
 
-def setup(client):
-    client.add_cog(Dawum(client))
+async def setup(client):
+    await client.add_cog(Dawum(client))

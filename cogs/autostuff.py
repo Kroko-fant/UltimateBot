@@ -14,13 +14,10 @@ class Autostuff(commands.Cog):
 	async def bump(self):
 		for g in self.client.guilds:
 			chid = self.client.dbconf_get(g.id, "bump")
-			try:
-				if chid is None:
-					return
-				channel = self.client.get_channel(int(chid))
-				if channel is None:
-					return
-			except Exception:
+			if chid is None:
+				continue
+			channel = self.client.get_channel(int(chid))
+			if channel is None:
 				return
 			await channel.send("dlm!bump")
 
@@ -29,5 +26,5 @@ class Autostuff(commands.Cog):
 		await self.client.wait_until_ready()
 
 
-def setup(client):
-	client.add_cog(Autostuff(client))
+async def setup(client):
+	await client.add_cog(Autostuff(client))

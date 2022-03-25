@@ -1,12 +1,12 @@
+import asyncio
 import logging
 import os
-import time as t
-
+import aiohttp
 import discord
+import customclient
+import time as t
 from discord import Intents
 from discord.ext import commands
-
-import customclient
 from dbmgr import DbMgr
 
 
@@ -26,20 +26,6 @@ handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(me
 logger.addHandler(handler)
 client = customclient.CustomClient(
     DbMgr("db"), command_prefix=get_prefix, intents=Intents.all(), case_insensitive=True)
-
-
-def load_modules():
-    # Module beim Botstart laden
-    for filename in os.listdir('./cogs'):
-        if filename.endswith(".py"):
-            if not filename.startswith('test'):
-                client.load_extension(f'cogs.{filename[:-3]}')
-                print(filename[:-3] + ' aktiviert')
-        elif filename.endswith('__pycache__'):
-            print('Py-Cache gefunden')
-        else:
-            print('\x1b[6;30;42m' + f"Fehlerhafte File auf dem Server gefunden! {filename}" + '\x1b[0m')
-    print('Module geladen')
 
 
 async def reload_modules(ctx):
@@ -86,7 +72,7 @@ async def status(ctx, *, status_text):
 @commands.is_owner()
 async def load(ctx, extension):
     """Lädt ein Modul in den Bot"""
-    client.load_extension(f'cogs.{extension.lower()}')
+    await client.load_extension(f'cogs.{extension.lower()}')
     await ctx.send(f":green_circle: {extension} aktiviert", delete_after=client.del_time_long)
     print(f'{extension} aktiviert')
 
@@ -95,7 +81,7 @@ async def load(ctx, extension):
 @commands.is_owner()
 async def unload(ctx, extension):
     """Lädt ein Modul aus dem Bot"""
-    client.unload_extension(f'cogs.{extension.lower()}')
+    await client.unload_extension(f'cogs.{extension.lower()}')
     print(f'{extension} deaktiviert')
     await ctx.send(f':red_circle: {extension} deaktiviert', delete_after=client.del_time_long)
 
@@ -107,17 +93,17 @@ async def reload(ctx, extension):
     if extension == "all":
         await reload_modules(ctx)
     else:
-        client.reload_extension(f'cogs.{extension.lower()}')
+        await client.reload_extension(f'cogs.{extension.lower()}')
         await ctx.send(f':white_circle: {extension} neugeladen.', delete_after=client.del_time_long)
 
 
 @client.command()
 @commands.is_owner()
-async def shutdown(ctx, reason="erwarteter Shutdown"):
-    """Fährt den Bot herunter. Danach muss man ihn auf dem Server in der Console neustarten lol."""
+async def shutdown(ctx):
+    """Fährt den Bot herunter.
+    Danach muss man ihn auf dem Server in der Console neustarten lol."""
     await ctx.send("Bot wird heruntergefahren...")
-    client.reason = reason
-    await client.close()
+    await client.logout()
 
 
 # Errorhandler for Extension-Errors
@@ -151,5 +137,13 @@ async def on_command_error(ctx, error, force=False):
 
 
 print("Botstart abgeschlossen!")
-load_modules()
-client.run(os.environ.get("DISCORD_TOKEN"))
+
+
+async def main():
+    async with aiohttp.ClientSession() as session:
+        async with client:
+            client.session = session
+            await client.start(os.environ.get("DISCORD_TOKEN"))
+
+
+asyncio.run(main())

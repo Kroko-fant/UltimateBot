@@ -44,7 +44,7 @@ class Fun(commands.Cog):
 		"""Gebe eine zufällige Zahl zwischen 0 und x ein.
 		Syntax: {prefix}randomnumber <x>
 		Hat x keinen Wert bekommt x automatisch 100 zugewiesen."""
-		if int2 <= 0:
+		if int2 < 1:
 			await ctx.send("Deine Zahl sollte größer als 0 sein!")
 		else:
 			await self.client.send(ctx, f"Deine Nummer zwischen 0 und {int2} lautet: **{random.randint(0, int2)}**")
@@ -89,5 +89,5 @@ class Fun(commands.Cog):
 		await ctx.send(embed=userinfoembed)
 
 
-def setup(client):
-	client.add_cog(Fun(client))
+async def setup(client):
+	await client.add_cog(Fun(client))

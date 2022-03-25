@@ -48,11 +48,13 @@ class Moderation(commands.Cog):
 		members = list(dict.fromkeys(members))
 		members.remove("")
 		for m in members:
-			member = ctx.guild.get_member(int(m))
+			if (member := ctx.guild.get_member(int(m))) is None:
+				await ctx.send(f"User {member}")
+				continue
 			if ctx.author.top_role <= member.top_role:
 				continue
 			await member.ban(reason="Multiban")
 
 
-def setup(client):
-	client.add_cog(Moderation(client))
+async def setup(client):
+	await client.add_cog(Moderation(client))

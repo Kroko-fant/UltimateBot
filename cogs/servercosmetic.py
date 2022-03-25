@@ -137,5 +137,5 @@ class ServerCosmetic(commands.Cog):
                         await message.add_reaction(emoji=emoji)
 
 
-def setup(client):
-    client.add_cog(ServerCosmetic(client))
+async def setup(client):
+    await client.add_cog(ServerCosmetic(client))

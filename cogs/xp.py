@@ -50,8 +50,7 @@ class Xp(commands.Cog):
 				return lev - 1
 	
 	def get_vorstellen(self, guild_id):
-		vorstellen = self.client.dbconf_get(guild_id, "vorstellen")
-		if vorstellen is None:
+		if (vorstellen := self.client.dbconf_get(guild_id, "vorstellen")) is None:
 			return None
 		return vorstellen
 	
@@ -130,22 +129,22 @@ class Xp(commands.Cog):
 		async def add_xp(bonusxp=0, force_dm=False):
 			with self.client.db.get(ctx.guild.id) as db:
 				old = db.execute("SELECT xp, level FROM leveldata WHERE userId = ?", (ctx.author.id,)).fetchall()
-				oldlev = 0
+				old_level = 0
 				if len(old) == 0:
 					x = round(get_text_xp(len(ctx.content)), 2) + bonusxp
 				else:
 					x = float(old[0][0]) + get_text_xp(len(ctx.content)) + bonusxp
-					oldlev = old[0][1]
+					old_level = old[0][1]
 
-				lev = oldlev
+				lev = old_level
 				old_max_xp = self.levels[lev + 1]
 				while x > old_max_xp:
 					lev += 1
-					x -= self.levels[oldlev]
+					x -= self.levels[old_level]
 					old_max_xp = self.levels[lev + 1]
 				db.execute(
 					"INSERT OR REPLACE INTO leveldata (userId, level, xp) VALUES (?, ?, ?)", (ctx.author.id, lev, x))
-				if oldlev < lev:
+				if old_level < lev:
 					if force_dm:
 						await self.client.send_dm(
 							member=ctx.author,
@@ -158,8 +157,7 @@ class Xp(commands.Cog):
 			return
 		
 		if str(ctx.channel.id) == self.get_vorstellen(ctx.guild.id):
-			role_name = self.client.dbconf_get(ctx.guild.id, "vorgestellt")
-			if role_name is None:
+			if (role_name := self.client.dbconf_get(ctx.guild.id, "vorgestellt")) is None:
 				pass
 			else:
 				
@@ -221,16 +219,16 @@ class Xp(commands.Cog):
 			voice_xp = round(get_voice_xp(voice_time), 2)
 			with self.client.db.get(del_member.guild.id) as db:
 				old = db.execute("SELECT xp, level FROM leveldata WHERE userId = ?", (del_member.id,)).fetchall()
-				oldlev = 0
+				old_level = 0
 				if len(old) != 0:
 					voice_xp =float(old[0][0]) + voice_xp
-					oldlev = old[0][1]
+					old_level = old[0][1]
 				
-				lev = oldlev
+				lev = old_level
 				old_max_xp = self.levels[lev + 1]
 				while voice_xp > old_max_xp:
 					lev += 1
-					voice_xp -= self.levels[oldlev]
+					voice_xp -= self.levels[old_level]
 					old_max_xp = self.levels[lev + 1]
 				
 				db.execute(
@@ -251,9 +249,9 @@ class Xp(commands.Cog):
 				put_user_in(in_member=member)
 
 
-def setup(client):
+async def setup(client):
 	voice_states.clear()
-	client.add_cog(Xp(client))
+	await client.add_cog(Xp(client))
 
 
 def teardown(client):
