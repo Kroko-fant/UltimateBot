@@ -18,7 +18,7 @@ def get_prefix(client, message):
 
 
 logger = logging.getLogger('discord')
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.WARNING)
 handler = logging.FileHandler(
     filename=f'./logs/[{t.struct_time(t.gmtime())[0]}-{t.struct_time(t.gmtime())[1]}-{t.struct_time(t.gmtime())[2]}]-['
              f'{t.struct_time(t.gmtime())[3]}_{t.struct_time(t.gmtime())[4]}]-discord.log', encoding='utf-8', mode='w')
@@ -45,8 +45,7 @@ async def reload_modules(ctx):
 
 @client.event
 async def on_ready():
-    print(f'{client.user} ist jetzt online')
-    print(f'Bot läuft auf {len(client.guilds)} Servern')
+    print(f'{client.user} ist jetzt online\nfBot läuft auf {len(client.guilds)} Servern')
     await client.change_presence(status=discord.Status.online, activity=discord.Game('Bot online und bereit'))
     for g in client.guilds:
         client.prefixes[g.id] = client.dbconf_get(g.id, 'prefix', '!')

@@ -9,7 +9,7 @@ class ErrorHandler(commands.Cog):
 
 	# ErrorHandler
 	@commands.Cog.listener()
-	async def on_command_error(self, ctx, error, force=False):
+	async def on_command_error(self, ctx: commands.Context, error: commands.CommandError, force=False):
 		await ctx.message.delete(delay=10)
 		# Skippen, wenn wir einen lokalen Handler haben
 		if hasattr(ctx.command, 'on_error') and not force:

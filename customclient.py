@@ -1,7 +1,6 @@
 import os
 
 from discord.ext.commands import Bot
-from custom.reaction_decoder import ReactionDecoder
 
 
 class CustomClient(Bot):
@@ -13,10 +12,9 @@ class CustomClient(Bot):
         self.del_time_mid = 30
         self.del_time_long = 60
         self.prefixes = dict()
-        self.rdecoder = ReactionDecoder()
 
-    def get_server_prefix(self, guildid):
-        return self.prefixes[guildid] if guildid in self.prefixes else "!"
+    def get_server_prefix(self, guild_id):
+        return self.prefixes[guild_id] if guild_id in self.prefixes else "!"
 
     async def send(self, sendable, content):
         if len(content) <= 2000:
@@ -41,13 +39,16 @@ class CustomClient(Bot):
         for i in contentlist:
             await sendable.send(i)
 
-    async def send_dm(self, member, content):
+    async def send_dm(self, member, content, embed=False):
         if member.bot:
             return
         if member.dm_channel is None:
             await member.create_dm()
         try:
-            await member.dm_channel.send(content)
+            if not embed:
+                await member.dm_channel.send(content)
+            else:
+                await member.dm_channel.send(embed=content)
             return True
         except Exception:
             return False
@@ -90,7 +91,7 @@ class CustomClient(Bot):
                 channel = self.get_channel(int(channel))
                 if channel is None:
                     continue
-                await channel.send(f"Bot wird für {self.reason} heruntergefahren")
+                # await channel.send(f"Bot wird für {self.reason} heruntergefahren")
         # self.loop._check_closed = lambda: True
         await super().close()
         self.db.close_all()
